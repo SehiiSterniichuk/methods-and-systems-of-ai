@@ -4,7 +4,7 @@ import './App.css';
 
 async function sendRequest(v1: number, v2: number) {
     try {
-        const url = `http://localhost:8080/api/v1/math/sum/${v1}/${v2}`;;
+        const url = `http://localhost:8080/api/v1/math/sum/${v1}/${v2}`;
         return await fetch(url, {
             method: 'POST', // or 'POST', 'PUT', etc. depending on your API
         });
