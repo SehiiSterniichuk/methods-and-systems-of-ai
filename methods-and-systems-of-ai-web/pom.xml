@@ -11,8 +11,8 @@
     <artifactId>methods-and-systems-of-ai-web</artifactId>
 
     <properties>
-        <node.version>18.16.0</node.version>
-        <npm.version>10.0.0</npm.version>
+        <node.version>v18.16.0</node.version>
+        <npm.version>v9.3.1</npm.version>
         <frontend-maven-plugin.version>1.14.0</frontend-maven-plugin.version>
     </properties>
 
