@@ -10,7 +10,7 @@ import java.util.Arrays;
 @Component
 public class BootStrap implements CommandLineRunner {
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         System.out.println(System.getProperty("java.version"));
         System.out.println(Arrays.toString(args));
         int[] a = new int[100];
