@@ -5,5 +5,6 @@ import org.example.travellingsalesmanservice.service.CrossoverMethod;
 public record AlgorithmConfiguration(int iterationNumber,
                                      int showEachIterationStep,
                                      int populationSize,
+                                     float mutationProbability,
                                      CrossoverMethod crossover) {
 }
