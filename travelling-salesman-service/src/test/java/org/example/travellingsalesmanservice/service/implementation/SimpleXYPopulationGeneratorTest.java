@@ -21,8 +21,8 @@ class SimpleXYPopulationGeneratorTest {
     @Test
     void checkLength() {
         XYPopulationGenerator.Points points = generator.generateChromosomes(new Dataset(array), amountOfGenes);
-        assertEquals(points.x().length, N * amountOfGenes);
-        assertEquals(points.y().length, N * amountOfGenes);
+        assertEquals(points.x().length, N * amountOfGenes + 1);
+        assertEquals(points.y().length, N * amountOfGenes + 1);
     }
 
     @Test
