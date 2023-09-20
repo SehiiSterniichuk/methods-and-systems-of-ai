@@ -3,8 +3,8 @@ package org.example.travellingsalesmanservice.service.implementation;
 import jdk.incubator.vector.IntVector;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
+import org.example.travellingsalesmanservice.domain.Chromosome;
 import org.example.travellingsalesmanservice.service.PathLengthEstimator;
-import org.example.travellingsalesmanservice.service.XYPopulationGenerator;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,7 +12,7 @@ public class VectorAPIPathLengthEstimator implements PathLengthEstimator {
     public static final VectorSpecies<Integer> species = IntVector.SPECIES_PREFERRED;
 
     @Override
-    public void calculateSquaredPathLength(XYPopulationGenerator.Points chromosomes, int[] pathLengths) {
+    public void calculateSquaredPathLength(Chromosome chromosomes, int[] pathLengths) {
         calculateSquaredPathLength(chromosomes.x(), chromosomes.y(), pathLengths);
     }
 

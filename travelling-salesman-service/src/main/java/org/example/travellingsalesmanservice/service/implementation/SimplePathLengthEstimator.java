@@ -1,11 +1,11 @@
 package org.example.travellingsalesmanservice.service.implementation;
 
+import org.example.travellingsalesmanservice.domain.Chromosome;
 import org.example.travellingsalesmanservice.service.PathLengthEstimator;
-import org.example.travellingsalesmanservice.service.XYPopulationGenerator;
 
 public class SimplePathLengthEstimator implements PathLengthEstimator {
     @Override
-    public void calculateSquaredPathLength(XYPopulationGenerator.Points chromosomes, int[] pathLengths) {
+    public void calculateSquaredPathLength(Chromosome chromosomes, int[] pathLengths) {
         var x = chromosomes.x();
         var y = chromosomes.y();
         int length = x.length - 1;

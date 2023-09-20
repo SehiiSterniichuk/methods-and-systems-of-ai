@@ -1,8 +1,8 @@
 package org.example.travellingsalesmanservice.service.implementation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.travellingsalesmanservice.domain.Chromosome;
 import org.example.travellingsalesmanservice.service.PathLengthEstimator;
-import org.example.travellingsalesmanservice.service.XYPopulationGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -22,7 +22,7 @@ class VectorAPIPathLengthEstimatorTest {
         int[] yData = new int[length + 1];
         System.arraycopy(xData, 0, yData, 0, xData.length);
         int[] actual = new int[1];
-        XYPopulationGenerator.Points chromosomes = new XYPopulationGenerator.Points(xData, yData);
+        Chromosome chromosomes = new Chromosome(xData, yData);
         estimator.calculateSquaredPathLength(chromosomes, actual);
         int[] expected = new int[1];
         simpleEstimator.calculateSquaredPathLength(chromosomes, expected);
@@ -38,7 +38,7 @@ class VectorAPIPathLengthEstimatorTest {
         int[] yData = new int[length + 1];
         System.arraycopy(xData, 0, yData, 0, xData.length);
         int[] actual = new int[1];
-        XYPopulationGenerator.Points chromosomes = new XYPopulationGenerator.Points(xData, yData);
+        Chromosome chromosomes = new Chromosome(xData, yData);
         estimator.calculateSquaredPathLength(chromosomes, actual);
         int[] expected = new int[1];
         simpleEstimator.calculateSquaredPathLength(chromosomes, expected);
@@ -54,7 +54,7 @@ class VectorAPIPathLengthEstimatorTest {
         int[] yData = new int[length + 1];
         System.arraycopy(xData, 0, yData, 0, xData.length);
         int[] actual = new int[1];
-        XYPopulationGenerator.Points chromosomes = new XYPopulationGenerator.Points(xData, yData);
+        Chromosome chromosomes = new Chromosome(xData, yData);
         estimator.calculateSquaredPathLength(chromosomes, actual);
         int[] expected = new int[1];
         simpleEstimator.calculateSquaredPathLength(chromosomes, expected);
@@ -73,7 +73,7 @@ class VectorAPIPathLengthEstimatorTest {
         int[] yData = new int[xData.length];
         System.arraycopy(xData, 0, yData, 0, xData.length);
         int[] actual = new int[numberOfPaths];
-        XYPopulationGenerator.Points chromosomes = new XYPopulationGenerator.Points(xData, yData);
+        Chromosome chromosomes = new Chromosome(xData, yData);
         estimator.calculateSquaredPathLength(chromosomes, actual);
         int[] expected = new int[numberOfPaths];
         simpleEstimator.calculateSquaredPathLength(chromosomes, expected);
@@ -91,7 +91,7 @@ class VectorAPIPathLengthEstimatorTest {
         int[] yData = new int[xData.length];
         System.arraycopy(xData, 0, yData, 0, xData.length);
         int[] actual = new int[numberOfPaths];
-        XYPopulationGenerator.Points chromosomes = new XYPopulationGenerator.Points(xData, yData);
+        Chromosome chromosomes = new Chromosome(xData, yData);
         estimator.calculateSquaredPathLength(chromosomes, actual);
         int[] expected = new int[numberOfPaths];
         simpleEstimator.calculateSquaredPathLength(chromosomes, expected);
@@ -109,7 +109,7 @@ class VectorAPIPathLengthEstimatorTest {
         int[] yData = new int[xData.length];
         System.arraycopy(xData, 0, yData, 0, xData.length);
         int[] actual = new int[numberOfPaths];
-        XYPopulationGenerator.Points chromosomes = new XYPopulationGenerator.Points(xData, yData);
+        Chromosome chromosomes = new Chromosome(xData, yData);
         estimator.calculateSquaredPathLength(chromosomes, actual);
         int[] expected = new int[numberOfPaths];
         simpleEstimator.calculateSquaredPathLength(chromosomes, expected);

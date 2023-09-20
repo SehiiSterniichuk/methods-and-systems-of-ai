@@ -1,10 +1,8 @@
 package org.example.travellingsalesmanservice.service;
 
 import org.example.travellingsalesmanservice.domain.Dataset;
+import org.example.travellingsalesmanservice.domain.Chromosome;
 
 public interface XYPopulationGenerator {
-    Points generateChromosomes(Dataset dataset, int amountOfGenes);
-
-    record Points(int[] x, int[] y){
-    }
+    Chromosome generateChromosomes(Dataset dataset, int amountOfGenes);
 }

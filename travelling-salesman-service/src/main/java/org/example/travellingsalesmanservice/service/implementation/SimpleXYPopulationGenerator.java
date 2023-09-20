@@ -2,6 +2,7 @@ package org.example.travellingsalesmanservice.service.implementation;
 
 import org.example.travellingsalesmanservice.domain.Dataset;
 import org.example.travellingsalesmanservice.domain.Point;
+import org.example.travellingsalesmanservice.domain.Chromosome;
 import org.example.travellingsalesmanservice.service.XYPopulationGenerator;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ class SimpleXYPopulationGenerator implements XYPopulationGenerator {
     private final Random rand = new Random();
 
     @Override
-    public Points generateChromosomes(Dataset dataset, int amountOfGenes) {
+    public Chromosome generateChromosomes(Dataset dataset, int amountOfGenes) {
         Point[] data = dataset.data();
         int setLength = data.length;
         assert setLength >= 2;
@@ -34,7 +35,7 @@ class SimpleXYPopulationGenerator implements XYPopulationGenerator {
         }
         x[allGenesNumber] = xStart;
         y[allGenesNumber] = yStart;
-        return new Points(x, y);
+        return new Chromosome(x, y);
     }
 
     private void pasteGenes(int[] target, int[] source, int[] genes, int startIndex) {

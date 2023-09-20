@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.service;
 
-@SuppressWarnings("unused")
+import org.example.travellingsalesmanservice.domain.Chromosome;
+
 public interface CrossoverMethod {
-    int[][] createChildren(int[] parent1, int[] parent2);
+    void crossover(Chromosome p, int[] pathLengths, SecondParentSearcher searcher);
 }

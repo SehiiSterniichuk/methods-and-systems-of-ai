@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.service.implementation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.travellingsalesmanservice.domain.Chromosome;
 import org.example.travellingsalesmanservice.domain.Dataset;
 import org.example.travellingsalesmanservice.domain.Point;
 import org.example.travellingsalesmanservice.service.XYPopulationGenerator;
@@ -20,19 +21,19 @@ class SimpleXYPopulationGeneratorTest {
 
     @Test
     void checkLength() {
-        XYPopulationGenerator.Points points = generator.generateChromosomes(new Dataset(array), amountOfGenes);
-        assertEquals(points.x().length, N * amountOfGenes + 1);
-        assertEquals(points.y().length, N * amountOfGenes + 1);
+        Chromosome chromosome = generator.generateChromosomes(new Dataset(array), amountOfGenes);
+        assertEquals(chromosome.x().length, N * amountOfGenes + 1);
+        assertEquals(chromosome.y().length, N * amountOfGenes + 1);
     }
 
     @Test
     void checkContains() {
-        XYPopulationGenerator.Points points = generator.generateChromosomes(new Dataset(array), amountOfGenes);
+        Chromosome chromosome = generator.generateChromosomes(new Dataset(array), amountOfGenes);
         for (int geneIndex = 0; geneIndex < amountOfGenes; geneIndex++) {
             int startIndex = geneIndex * N;
             int endIndex = startIndex + N;
-            long xCount = Arrays.stream(points.x(), startIndex, endIndex).distinct().count();
-            long yCount = Arrays.stream(points.y(), startIndex, endIndex).distinct().count();
+            long xCount = Arrays.stream(chromosome.x(), startIndex, endIndex).distinct().count();
+            long yCount = Arrays.stream(chromosome.y(), startIndex, endIndex).distinct().count();
             assertEquals(xCount, N);
             assertEquals(yCount, N);
         }
