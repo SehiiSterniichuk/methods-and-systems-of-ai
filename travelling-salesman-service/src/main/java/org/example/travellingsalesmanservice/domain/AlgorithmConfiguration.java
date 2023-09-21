@@ -1,6 +1,6 @@
 package org.example.travellingsalesmanservice.domain;
 
-import org.example.travellingsalesmanservice.service.CrossoverMethod;
+import org.example.travellingsalesmanservice.service.CrossoverAlgorithm;
 import org.example.travellingsalesmanservice.service.SecondParentSearcher;
 
 public record AlgorithmConfiguration(int iterationNumber,
@@ -8,6 +8,6 @@ public record AlgorithmConfiguration(int iterationNumber,
                                      int showEachIterationStep,
                                      int populationSize,
                                      float mutationProbability,
-                                     CrossoverMethod crossoverMethod,
+                                     CrossoverAlgorithm crossoverAlgorithm,
                                      SecondParentSearcher searcher) {
 }

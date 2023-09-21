@@ -7,6 +7,8 @@ import org.example.travellingsalesmanservice.service.TravellingSalesmanSolver;
 import org.example.travellingsalesmanservice.service.XYPopulationGenerator;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 
 @SuppressWarnings("unused")
 @Component
@@ -19,13 +21,14 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
     @Override
     public TrackingEntity start(Dataset dataset, AlgorithmConfiguration config) {
         Result bestResult;
+        TrackingEntity entity = new TrackingEntity(new ArrayList<>(1));
         var chromosomes = generator.generateChromosomes(dataset, config.populationSize());
         var pathLengths = new int[config.populationSize()];
         estimator.calculateSquaredPathLength(chromosomes, pathLengths);
         int counterOfSameResults = 0;
         bestResult = findBestPath(chromosomes, pathLengths);
         for (int i = 0; i < config.iterationNumber(); i++) {
-            config.crossoverMethod().crossover(chromosomes, pathLengths, config.searcher());
+            config.crossoverAlgorithm().crossover(chromosomes, pathLengths, config.searcher());
             estimator.calculateSquaredPathLength(chromosomes, pathLengths);
             var currentResult = findBestPath(chromosomes, pathLengths);
             if (currentResult.isBetterThan(bestResult)) {
@@ -33,10 +36,14 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
             } else if (counterOfSameResults < config.allowedNumberOfGenerationsWithTheSameResult()) {
                 counterOfSameResults++;
             } else {
+                entity.update(bestResult, i);
                 break;
             }
+            if(i % config.showEachIterationStep() == 0){
+                entity.update(bestResult, i);
+            }
         }
-        return null;
+        return entity;
     }
 
     private Result findBestPath(Chromosome chromosomes, int[] pathLengths) {
