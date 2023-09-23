@@ -5,26 +5,69 @@ import org.example.travellingsalesmanservice.algorithm.domain.Chromosome;
 import org.example.travellingsalesmanservice.algorithm.service.CrossoverMethod;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static java.lang.StringTemplate.STR;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class CycleCrossoverMethodTest {
     @Test
     void testWhenOneShift() {
-        int[] xData = {1,2,34,5};
-        int[] yData = {1,2,34,5};
-        int[] xData2 = {1,34,5,2};
-        int[] yData2 = {1,34,5,2};
+        int[] xData = {1, 2, 34, 5};
+        int[] yData = {1, 2, 34, 5};
+        int[] xData2 = {1, 34, 5, 2};
+        int[] yData2 = {1, 34, 5, 2};
         testDuplicate(xData, yData, xData2, yData2);
     }
 
     @Test
+    void testAcademicSolution() {
+        int[] xData = IntStream.range(0, 10).toArray();
+        int[] yData = Arrays.copyOf(xData, xData.length);
+        int[] xDataCheck = Arrays.copyOf(xData, xData.length);
+        int[] xData2 = {0, 9, 3, 7, 8, 2, 6, 5, 1, 4};
+        int[] xData2Check = Arrays.copyOf(xData2, xData2.length);
+        int[] yData2 = Arrays.copyOf(xData2, xData2.length);
+        assertEquals(yData2.length, yData.length);
+        // Create two parents with the same city at the same index
+        Chromosome parent1 = new Chromosome(xData, yData);
+        Chromosome parent2 = new Chromosome(xData2, yData2);
+        // Create empty child chromosomes
+        Chromosome child1 = Chromosome.ofLength(xData.length);
+        Chromosome child2 = Chromosome.ofLength(xData.length);
+        // Create a CrossoverMethod implementation
+        CrossoverMethod crossoverMethod = new CycleCrossoverMethod(); // Replace with your actual implementation
+        log.info("parent1: " + parent1);
+        log.info("parent2: " + parent2);
+        // Perform crossover
+        crossoverMethod.createTwoChildren(parent1, parent2, child1, child2);
+        // Verify that the children have unique cities (no duplicates)
+        log.info("child1: " + child1);
+        log.info("child2: " + child2);
+        var samePositions = List.of(1, 4, 8, 6, 9);
+        for (var pos : samePositions) {
+            assertEquals(xDataCheck[pos], xData[pos]);
+            assertEquals(xData2Check[pos], xData2[pos]);
+        }
+        int[] newPositions = IntStream.range(1, 10)
+                .filter(x -> !samePositions.contains(x))
+                .toArray();
+        for (var newPos : newPositions) {
+            assertNotEquals(xData2Check[newPos], xData[newPos]);
+            assertNotEquals(xDataCheck[newPos], xData2[newPos]);
+        }
+    }
+
+
+    @Test
     void testWhenTwoShift() {
-        int[] xData = {0, 1,2,34,5};
-        int[] yData = {0, 1,2,34,5};
-        int[] xData2 = {0,34,5,1, 2};
-        int[] yData2 = {0,34,5,1, 2};
+        int[] xData = {0, 1, 2, 34, 5};
+        int[] yData = {0, 1, 2, 34, 5};
+        int[] xData2 = {0, 34, 5, 1, 2};
+        int[] yData2 = {0, 34, 5, 1, 2};
         testDuplicate(xData, yData, xData2, yData2);
     }
 
