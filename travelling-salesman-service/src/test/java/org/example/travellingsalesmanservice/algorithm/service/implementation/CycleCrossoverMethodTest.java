@@ -14,8 +14,8 @@ class CycleCrossoverMethodTest {
     void testWhenOneShift() {
         int[] xData = {1,2,34,5};
         int[] yData = {1,2,34,5};
-        int[] xData2 = {2,34,5,1};
-        int[] yData2 = {2,34,5,1};
+        int[] xData2 = {1,34,5,2};
+        int[] yData2 = {1,34,5,2};
         testDuplicate(xData, yData, xData2, yData2);
     }
 
@@ -23,8 +23,8 @@ class CycleCrossoverMethodTest {
     void testWhenTwoShift() {
         int[] xData = {0, 1,2,34,5};
         int[] yData = {0, 1,2,34,5};
-        int[] xData2 = {2,34,5,1, 0};
-        int[] yData2 = {2,34,5,1, 0};
+        int[] xData2 = {0,34,5,1, 2};
+        int[] yData2 = {0,34,5,1, 2};
         testDuplicate(xData, yData, xData2, yData2);
     }
 

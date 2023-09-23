@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,7 +65,7 @@ class TaskServiceImplTest {
         TaskConfig config = TaskConfig
                 .builder()
                 .iterationNumber(limit * 40)
-                .mutationProbability((float) limit / 100)
+                .mutationProbability((float) limit / 50)
                 .populationSize(limit * 1000)
                 .showEachIterationStep(10)
                 .allowedNumberOfGenerationsWithTheSameResult(limit * 2)
@@ -76,15 +77,20 @@ class TaskServiceImplTest {
         log.info(config.toString());
         Point[] p = Stream.generate(() -> Point.getRandom(1000)).distinct().limit(limit).toArray(Point[]::new);
         TaskId task = service.createTask(config, new Dataset(p));
+        log.info("input: "  + Arrays.toString(p));
         long id = task.id();
         assertTrue(id > 0);
         ResultResponse response = service.getTask(id);
         assertNotNull(response);
+        log.info(response.toString());
         while (response.isHasNext()) {
-            log.info(response.toString());
             response = service.getTask(id);
             assertNotNull(response);
+            log.info(response.toString());
+            assertEquals(p.length, Arrays.stream(response.getResult().path()).distinct().count());
         }
         log.info(response.toString());
+        assertNotNull(response.getResult());
+        assertEquals(p.length, Arrays.stream(response.getResult().path()).distinct().count());
     }
 }

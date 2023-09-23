@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.algorithm.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.travellingsalesmanservice.algorithm.domain.*;
 import org.example.travellingsalesmanservice.algorithm.service.PathLengthEstimator;
 import org.example.travellingsalesmanservice.algorithm.service.TrackingEntity;
@@ -13,6 +14,7 @@ import static java.lang.StringTemplate.STR;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 class GeneticAlgorithm implements TravellingSalesmanSolver {
     private final PathLengthEstimator estimator;
     private final XYPopulationGenerator generator;
@@ -28,14 +30,20 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
         var chromosomes = generator.generateChromosomes(dataset, taskConfig.populationSize());
         var pathLengths = new int[taskConfig.populationSize()];
         estimator.calculateSquaredPathLength(chromosomes, pathLengths);
-        start(configuration, chromosomes, pathLengths, taskConfig, entity);
+        try {
+            start(configuration, chromosomes, pathLengths, taskConfig, entity);
+        } catch (RuntimeException e) {
+            entity.putFinish(null, -1, e.getMessage());
+            throw e;
+        }
     }
 
     private void start(AlgorithmConfiguration configuration, Chromosome chromosomes,
                        int[] pathLengths, TaskConfig taskConfig, TrackingEntity entity) {
         int counterOfSameResults = 0;
         Result bestResult = findBestPath(chromosomes, pathLengths);
-        for (int i = 0; i < taskConfig.iterationNumber(); i++) {
+        int i = 0;
+        for (; i < taskConfig.iterationNumber(); i++) {
             configuration.crossoverAlgorithm().crossover(chromosomes, pathLengths, configuration.searcher(),
                     configuration.taskConfig().mutationProbability());
             estimator.calculateSquaredPathLength(chromosomes, pathLengths);
@@ -52,10 +60,9 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
             }
             if (i % taskConfig.showEachIterationStep() == 0) {
                 entity.put(bestResult, i, "Show iteration");
+            } else if (i + 1 == taskConfig.iterationNumber()) {
+                entity.putFinish(bestResult, i, STR."Finished all iterations.");
             }
-        }
-        if(counterOfSameResults < taskConfig.allowedNumberOfGenerationsWithTheSameResult()){
-            entity.putFinish(bestResult, -1, STR."Finished all iterations.");
         }
     }
 
@@ -91,8 +98,8 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
             }
         }
         Point[] bestPath = new Point[numberOfCities];
-        for (int i = 0; i < numberOfCities; i++) {
-            int index = i + minIndex;
+        int index = minIndex * numberOfCities;
+        for (int i = 0; i < numberOfCities; i++, index++) {
             bestPath[i] = new Point(chromosomes.x()[index], chromosomes.y()[index]);
         }
         return new Result(bestPath, Math.sqrt(min));

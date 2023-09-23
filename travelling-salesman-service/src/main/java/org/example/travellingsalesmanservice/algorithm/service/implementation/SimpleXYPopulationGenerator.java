@@ -23,7 +23,7 @@ class SimpleXYPopulationGenerator implements XYPopulationGenerator {
         int[] y = new int[allGenesNumber + 1];
         int[] genes = IntStream.range(1, setLength).toArray();//indexes of 'Point's
         int[] xData = Arrays.stream(data).mapToInt(Point::x).toArray();
-        int[] yData = Arrays.stream(data).mapToInt(Point::x).toArray();
+        int[] yData = Arrays.stream(data).mapToInt(Point::y).toArray();
         int xStart = xData[0];
         int yStart = yData[0];
         for (int i = 0; i < allGenesNumber; i += setLength) {
@@ -45,8 +45,9 @@ class SimpleXYPopulationGenerator implements XYPopulationGenerator {
     }
 
     private void shuffle(int[] array) {
-        for (int i = 0; i < array.length; i++) {
-            int randomIndexToSwap = rand.nextInt(array.length);
+        int length = array.length;
+        for (int i = 1; i < length; i++) {
+            int randomIndexToSwap = rand.nextInt(length - 1) + 1;
             int temp = array[randomIndexToSwap];
             array[randomIndexToSwap] = array[i];
             array[i] = temp;

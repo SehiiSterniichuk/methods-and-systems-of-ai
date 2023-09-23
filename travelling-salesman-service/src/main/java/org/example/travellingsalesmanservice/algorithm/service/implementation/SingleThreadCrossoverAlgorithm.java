@@ -28,14 +28,14 @@ public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
         Chromosome parent2 = Chromosome.ofLength(chromosomeLength);
         for (int i = 0; i < pathLengths.length; i++) {
             int j = searcher.findSecond(i, pathLengths);
-            if (j == PARENT_NOT_FOUND || isMutation(mutationProbability)) {
-                mutation.mutate(p, i, chromosomeLength);
+            int p1 = i * chromosomeLength;
+            int p2 = j * chromosomeLength;
+            if (j == PARENT_NOT_FOUND || p.equalsSubChromosomes(p1, p2, chromosomeLength) || isMutation(mutationProbability)) {
+                mutation.mutate(p, p1, chromosomeLength);
                 pathLengths[i] = -1;
                 continue;
             }
-            int p1 = i * chromosomeLength;
             parent1.fillWith(0, p, p1, chromosomeLength);
-            int p2 = j * chromosomeLength;
             parent2.fillWith(0, p, p2, chromosomeLength);
             pathLengths[i] = -1;
             //todo check whether I need to mark second parent or not

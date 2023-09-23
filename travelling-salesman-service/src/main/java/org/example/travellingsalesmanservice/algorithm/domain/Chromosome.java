@@ -13,7 +13,7 @@ public record Chromosome(int[] x, int[] y) {
         System.arraycopy(source.y, sourceStart, y, start, length);
     }
 
-    public int size(){
+    public int size() {
         return x.length;
     }
 
@@ -30,17 +30,6 @@ public record Chromosome(int[] x, int[] y) {
                 .filter(i -> x[i] == xP && y[i] == yP)
                 .findAny().orElse(-1);
     }
-
-//    public void swapPoints(int i, Chromosome c2) {
-//        swap(x, c2.x, i);
-//        swap(y, c2.y, i);
-//    }
-
-//    private void swap(int[] array, int[] array2, int i) {
-//        int old = array[i];
-//        array[i] = array2[i];
-//        array2[i] = old;
-//    }
 
     @Override
     public String toString() {
@@ -64,5 +53,14 @@ public record Chromosome(int[] x, int[] y) {
         var temp = array[i];
         array[i] = array[j];
         array[j] = temp;
+    }
+
+    public boolean equalsSubChromosomes(int i, int j, int chromosomeLength) {
+        for (int k = 1; k < chromosomeLength; k++) {
+            if (!this.equalsPoints(k + i, k + j)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
