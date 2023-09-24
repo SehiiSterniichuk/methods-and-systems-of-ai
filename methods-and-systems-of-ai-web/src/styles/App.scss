@@ -1,0 +1,25 @@
+.salesman-body {
+  justify-content: unset;
+  padding-top: 2rem;
+
+  h1 {
+    margin-bottom: 1rem;
+  }
+
+  .task-list {
+  }
+}
+
+
+.task-wrapper {
+  width: 95%;
+
+  .task-list-title {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+}
+
+input{
+  border: 0;
+}
