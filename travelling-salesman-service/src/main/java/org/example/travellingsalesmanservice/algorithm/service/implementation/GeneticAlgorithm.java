@@ -58,9 +58,11 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
                 entity.putFinish(bestResult, i, STR."Finished. Counter of the same result: \{counterOfSameResults}");
                 break;
             }
-            if (i % taskConfig.showEachIterationStep() == 0) {
+            boolean show = i % taskConfig.showEachIterationStep() == 0;
+            boolean finish = i + 1 == taskConfig.iterationNumber();
+            if (show && !finish) {
                 entity.put(bestResult, i, "Show iteration");
-            } else if (i + 1 == taskConfig.iterationNumber()) {
+            } else if (finish) {
                 entity.putFinish(bestResult, i, STR."Finished all iterations.");
             }
         }

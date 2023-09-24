@@ -1,18 +1,15 @@
 import React, {useState, MouseEvent, useEffect} from 'react';
 import defaultImg from '../img/ukraine_admin_map.jpg';
 import '../styles/TaskConfiguration.scss';
+import {Point} from "../data/TaskData";
 
 interface Props {
     imgSource?: string;
+    coordinates: Point[];
+    setCoordinates: (value: (((prevState: Point[]) => Point[]) | Point[])) => void
 }
 
-export type Point = {
-    x: number;
-    y: number;
-}
-
-function PathView({imgSource = defaultImg}: Props) {
-    const [coordinates, setCoordinates] = useState<Point[]>([]);
+function PathView({coordinates, setCoordinates, imgSource = defaultImg}: Props) {
     const [position, setPosition] = useState<Point>({x: 0, y: 0});
     const [imgPosition, setImgPosition] = useState<Point>({x: 0, y: 0});
 
@@ -28,6 +25,9 @@ function PathView({imgSource = defaultImg}: Props) {
     };
 
     const handleImageClick = () => {
+        if (coordinates.findIndex(x=>x.y == position.y && x.x == position.x) >= 0){
+            return;
+        }
         let points = [...coordinates, position];
         setCoordinates(points);
     };

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/lab1/tasks/")
+@CrossOrigin(origins = {"*", "**", "localhost:3000", "http://localhost:3000"})
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService service;
@@ -20,7 +21,7 @@ public class TaskController {
     }
 
     @GetMapping("{id}")
-    public ResultResponse getTask(@Nonnull Long id){
+    public ResultResponse getTask(@PathVariable @Nonnull Long id){
         return service.getTask(id);
     }
 }

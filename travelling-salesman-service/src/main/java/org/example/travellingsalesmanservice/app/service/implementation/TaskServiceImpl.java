@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.app.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.travellingsalesmanservice.algorithm.domain.*;
 import org.example.travellingsalesmanservice.algorithm.service.CrossoverAlgorithm;
 import org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher;
@@ -20,6 +21,7 @@ import static java.lang.StringTemplate.STR;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TaskServiceImpl implements TaskService {
 
     private final TaskExecutor executor;
@@ -36,14 +38,26 @@ public class TaskServiceImpl implements TaskService {
         executor.execute(() -> solver.start(dataset, algoConfig));
         long id = counter.incrementAndGet();
         map.put(id, entity);
+        log.info("Submitted task with id: {}", id);
         return new TaskId(id);
     }
 
     @Override
     @SuppressWarnings("preview")
     public ResultResponse getTask(Long id) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         TrackingEntity entity = map.get(id);
-        assert entity != null : STR."task with id: \{id} not found";
-        return entity.get();
+        if (entity == null) {
+            throw new IllegalStateException(STR."task with id: \{id} not found");
+        }
+        ResultResponse resultResponse = entity.get();
+        if (!resultResponse.isHasNext()) {
+            map.remove(id);
+        }
+        return resultResponse;
     }
 }
