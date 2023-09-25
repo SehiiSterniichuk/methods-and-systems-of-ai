@@ -5,5 +5,5 @@ import org.example.travellingsalesmanservice.algorithm.domain.Dataset;
 
 @SuppressWarnings("unused")
 public interface TravellingSalesmanSolver {
-    void start(Dataset dataset, AlgorithmConfiguration algorithmConfiguration);
+    TrackingEntity start(Dataset dataset, AlgorithmConfiguration algorithmConfiguration);
 }

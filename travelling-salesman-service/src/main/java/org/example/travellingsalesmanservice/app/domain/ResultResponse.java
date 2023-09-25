@@ -3,7 +3,7 @@ package org.example.travellingsalesmanservice.app.domain;
 import lombok.*;
 import org.example.travellingsalesmanservice.algorithm.domain.Result;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor
 public class ResultResponse {

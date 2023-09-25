@@ -20,10 +20,10 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
     private final XYPopulationGenerator generator;
 
     @Override
-    public void start(Dataset dataset, AlgorithmConfiguration configuration) {
+    public TrackingEntity start(Dataset dataset, AlgorithmConfiguration configuration) {
         if (dataset.data().length < 4) {
             handleSimpleTask(dataset, configuration);
-            return;
+            return configuration.trackingEntity();
         }
         var taskConfig = configuration.taskConfig();
         var entity = configuration.trackingEntity();
@@ -36,6 +36,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
             entity.putFinish(null, -1, e.getMessage());
             throw e;
         }
+        return entity;
     }
 
     private void start(AlgorithmConfiguration configuration, Chromosome chromosomes,
