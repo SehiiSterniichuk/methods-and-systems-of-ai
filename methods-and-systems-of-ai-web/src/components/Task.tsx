@@ -101,7 +101,7 @@ function Task({webTaskId}: Props) {
         <div className={"task"}>
             <TaskConfiguration sendClicked={sendClicked} config={config} setConfig={setConfig}
                                taskConfigId={webTaskId}/>
-            <PathView coordinates={coordinates} setCoordinates={setCoordinates}/>
+            <PathView calculatedPath={result} coordinates={coordinates} setCoordinates={setCoordinates}/>
             <div className={"list-of-selected-points"}>
                 <p>Input: </p>
                 <p>{coordinates.map(p => `(${p.x},${p.y})`).join(',')}</p>

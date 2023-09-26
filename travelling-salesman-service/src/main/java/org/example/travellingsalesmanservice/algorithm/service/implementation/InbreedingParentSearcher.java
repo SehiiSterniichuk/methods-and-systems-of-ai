@@ -1,16 +1,18 @@
 package org.example.travellingsalesmanservice.algorithm.service.implementation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.IntStream;
 
 @Component
+@Slf4j
 class InbreedingParentSearcher implements SecondParentSearcher {
     @Override
     public int findSecond(int firstParentIndex, int[] pathLengths) {
         int first = pathLengths[firstParentIndex];
-        float diff = 0.3f;
+        float diff = 0.35f;
         int min = (int) (first - first * diff);
         int max = (int) (first + first * diff);
         return IntStream.range(firstParentIndex, pathLengths.length)
@@ -22,6 +24,5 @@ class InbreedingParentSearcher implements SecondParentSearcher {
                         .parallel()
                         .filter(i -> pathLengths[i] > 0)
                         .findAny().orElse(PARENT_NOT_FOUND));
-
     }
 }

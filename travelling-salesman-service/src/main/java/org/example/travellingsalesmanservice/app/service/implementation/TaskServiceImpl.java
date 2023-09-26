@@ -52,7 +52,9 @@ public class TaskServiceImpl implements TaskService {
     @SuppressWarnings("preview")
     public ResultResponse getTask(Long id) {
         var entity = map.get(id);
-        assert entity != null : STR. "task with id: \{id} not found";
+        if (entity == null) {
+            throw new IllegalStateException(STR."task with id: \{id} not found");
+        }
         ResultResponse resultResponse = entity.e.get();
         if (!resultResponse.isHasNext()) {
             map.remove(id);

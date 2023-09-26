@@ -1,4 +1,4 @@
-import React, {useState, MouseEvent, useEffect} from 'react';
+import React, {MouseEvent, useEffect, useState} from 'react';
 import defaultImg from '../img/ukraine_admin_map.jpg';
 import '../styles/TaskConfiguration.scss';
 import {Point} from "../data/TaskData";
@@ -6,10 +6,11 @@ import {Point} from "../data/TaskData";
 interface Props {
     imgSource?: string;
     coordinates: Point[];
+    calculatedPath: Point[];
     setCoordinates: (value: (((prevState: Point[]) => Point[]) | Point[])) => void
 }
 
-function PathView({coordinates, setCoordinates, imgSource = defaultImg}: Props) {
+function PathView({coordinates, calculatedPath, setCoordinates, imgSource = defaultImg}: Props) {
     const [position, setPosition] = useState<Point>({x: 0, y: 0});
     const [imgPosition, setImgPosition] = useState<Point>({x: 0, y: 0});
 
@@ -25,7 +26,7 @@ function PathView({coordinates, setCoordinates, imgSource = defaultImg}: Props) 
     };
 
     const handleImageClick = () => {
-        if (coordinates.findIndex(x=>x.y == position.y && x.x == position.x) >= 0){
+        if (coordinates.findIndex(x => x.y == position.y && x.x == position.x) >= 0) {
             return;
         }
         let points = [...coordinates, position];
@@ -33,10 +34,10 @@ function PathView({coordinates, setCoordinates, imgSource = defaultImg}: Props) 
     };
 
     useEffect(() => {
-        setDrawPoints(getDrawPoints);
+        setDrawPoints(getPointsPositions);
     }, [coordinates]);
 
-    function getDrawPoints() {
+    function getPointsPositions() {
         let i = 0;
         return coordinates.map(clickedPoint => {
             let x = clickedPoint.x;
@@ -72,20 +73,50 @@ function PathView({coordinates, setCoordinates, imgSource = defaultImg}: Props) 
             window.removeEventListener('resize', handleResize);
         };
     }, [imgPosition]);
-    const [drawPoints, setDrawPoints] = useState(getDrawPoints());
+    const [drawPoints, setDrawPoints] = useState(getPointsPositions());
+
+// Function to create SVG path from coordinates
+    function createPath() {
+        const isPresentRes = calculatedPath.length > 2;
+        const points = isPresentRes ? calculatedPath : coordinates;
+        const color = isPresentRes ? "red" : "black";
+        const pathData = points
+            .map((point) => `${point.x},${point.y}`)
+            .join(' ');
+        return (
+            <path
+                d={`M ${pathData} L ${points[0].x},${points[0].y}`}
+                fill="none"
+                stroke={color}
+            />
+        );
+    }
+
+    function getSvg() {
+        const imgElement = document.querySelector('.path-image'); // Replace with your image selector
+        const width = imgElement?.clientWidth || 0;
+        const height = imgElement?.clientHeight || 0;
+        return <svg className={"path"}
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{cursor: 'crosshair', width: `${width}`, height: `${height}`}}>{createPath()}
+        </svg>;
+    }
+
+    const svg = coordinates.length < 2 ? null : getSvg();
     return (
         <div className="path-view">
             <p>Point number: {coordinates.length}</p>
             <p>X: {position.x} Y: {position.y}</p>
-            <div className="img_wrapper">
+            <div className="img_wrapper"
+                 onMouseMove={handleMouseMove}
+                 onClick={handleImageClick}>
                 <img
                     className="path-image"
                     src={imgSource}
                     alt="map for path"
-                    onMouseMove={handleMouseMove}
-                    onClick={handleImageClick}
                     style={{cursor: 'crosshair'}}
                 />
+                {svg}
                 {drawPoints}
             </div>
         </div>

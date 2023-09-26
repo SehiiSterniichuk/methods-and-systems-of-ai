@@ -26,22 +26,32 @@ public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
         Chromosome child2 = Chromosome.ofLength(chromosomeLength);
         Chromosome parent1 = Chromosome.ofLength(chromosomeLength);
         Chromosome parent2 = Chromosome.ofLength(chromosomeLength);
-        for (int i = 0; i < pathLengths.length; i++) {
+        int processedParentsCounter = 0;
+        for (int i = 0; i < pathLengths.length && processedParentsCounter != pathLengths.length; i++) {
+            if (pathLengths[i] <= 0) {
+                continue;
+            } else if (isMutation(mutationProbability)) {
+                mutation.mutate(p, i * chromosomeLength, chromosomeLength);
+                pathLengths[i] = -1;
+                processedParentsCounter++;
+                continue;
+            }
             int j = searcher.findSecond(i, pathLengths);
             int p1 = i * chromosomeLength;
             int p2 = j * chromosomeLength;
-            if (j == PARENT_NOT_FOUND || p.equalsSubChromosomes(p1, p2, chromosomeLength) || isMutation(mutationProbability)) {
+            if (j == PARENT_NOT_FOUND || p.equalsSubChromosomes(p1, p2, chromosomeLength)) {
                 mutation.mutate(p, p1, chromosomeLength);
                 pathLengths[i] = -1;
+                processedParentsCounter++;
                 continue;
             }
             parent1.fillWith(0, p, p1, chromosomeLength);
             parent2.fillWith(0, p, p2, chromosomeLength);
-            pathLengths[i] = -1;
-            //todo check whether I need to mark second parent or not
+            pathLengths[i] = pathLengths[j] = -1;
             crossoverMethod.createTwoChildren(parent1, parent2, child1, child2);
             p.fillWith(p1, child1, 0, chromosomeLength);
             p.fillWith(p2, child2, 0, chromosomeLength);
+            processedParentsCounter += 2;
         }
     }
 
