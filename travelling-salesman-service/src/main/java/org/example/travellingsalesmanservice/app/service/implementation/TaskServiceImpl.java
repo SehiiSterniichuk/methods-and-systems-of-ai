@@ -53,13 +53,16 @@ public class TaskServiceImpl implements TaskService {
     public ResultResponse getTask(Long id) {
         var entity = map.get(id);
         if (entity == null) {
-            throw new IllegalStateException(STR."task with id: \{id} not found");
+            throw new IllegalStateException(STR. "task with id: \{ id } not found" );
         }
         ResultResponse resultResponse = entity.e.get();
         if (!resultResponse.isHasNext()) {
             map.remove(id);
             if (!entity.f.isDone()) {
                 entity.f.cancel(true);
+                log.info(STR. "task with id: \{ id } was canceled" );
+            } else {
+                log.info(STR. "Task with id: \{ id } is finished" );
             }
         }
         if (entity.f.state() == Future.State.FAILED) {

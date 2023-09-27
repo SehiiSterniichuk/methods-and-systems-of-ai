@@ -9,6 +9,7 @@ export const FirstTask: TaskData = {
 export const enum TaskStatus {
     CREATE = "CREATE",
     SENDING = "SENDING",
+    CONNECTING = "CONNECTING",
     SUBMITTED = "SUBMITTED",
     DONE = "DONE",
 }

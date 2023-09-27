@@ -50,7 +50,6 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
                 min: 0,
                 max: 10_000
             },]
-    console.log(inputs);
 
     function setIterations(x: React.FormEvent<HTMLInputElement>) {
         if (x.currentTarget.value == null) {

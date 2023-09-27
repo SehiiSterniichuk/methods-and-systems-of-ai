@@ -12,18 +12,19 @@ interface Props {
 
 
 async function getTask(id: number) {
+    let response: Response;
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/lab1/tasks/${id}`, {
+        response = await fetch(`http://localhost:8080/api/v1/lab1/tasks/${id}`, {
             method: 'GET',
         });
-        if (!response.ok) {
-            response.text().then(t => console.log(`HTTP error! body: ${t}`))
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response;
     } catch (error) {
         throw error;
     }
+    if (!response.ok) {
+        response.text().then(t => console.log(`HTTP error! body: ${t}`))
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response;
 }
 
 function Task({webTaskId}: Props) {
@@ -31,6 +32,9 @@ function Task({webTaskId}: Props) {
     const [coordinates, setCoordinates] = useState<Point[]>([]);
     const [result, setResult] = useState<Point[]>([]);
     const [pathLength, setPathLength] = useState(-1.0);
+    const [betterThanPrevious, setBetterThanPrevious] = useState(-1.0);
+    const [firstRes, setFirstRes] = useState(-1.0);
+    const [allLength, setAllLength] = useState<Set<string>>(new Set());
     const [hasNext, setHasNext] = useState(true);
     const [message, setMessage] = useState("");
     const [iteration, setIteration] = useState(-1);
@@ -48,7 +52,7 @@ function Task({webTaskId}: Props) {
                 body: JSON.stringify(request),
             });
             if (!response.ok) {
-                response.text().then(t => console.log(`HTTP error! body: ${t}`))
+                // response.text().then(t => console.log(`HTTP error! body: ${t}`))
                 console.error(`HTTP error! Status: ${response.status}`);
                 setHasNext(false);
             }
@@ -59,6 +63,9 @@ function Task({webTaskId}: Props) {
     }
 
     function sendClicked() {
+        if (TaskStatus.CREATE != status) {
+            return;
+        }
         const mutationProbability = config.mutationProbability / 100;
         const sendConfig = {...config, mutationProbability: mutationProbability}
         const request: PostTaskRequest = {config: sendConfig, dataset: {data: coordinates}};
@@ -77,9 +84,27 @@ function Task({webTaskId}: Props) {
         getTask(taskId)
             .then(x => x.json())
             .then(r => {
+                if (status == TaskStatus.CONNECTING) {
+                    setStatus(TaskStatus.SUBMITTED);
+                }
                 setHasNext(r.hasNext)
                 setResult(r.result.path)
-                setPathLength(r.result.pathLength)
+                const newPathLength = r.result.pathLength as number;
+                const newPathLengthStr = newPathLength.toFixed(2);
+                if (!allLength.has(newPathLengthStr)) {
+                    console.log("newPathLength: " + newPathLength + " old: " + pathLength)
+                    if (pathLength > 0) {
+                        setBetterThanPrevious((pathLength / newPathLength - 1) * 100);
+                    } else {
+                        setFirstRes(newPathLength);
+                    }
+                    setPathLength(newPathLength)
+                    setAllLength(() => {
+                        const set = new Set(allLength);
+                        set.add(newPathLengthStr);
+                        return set;
+                    });
+                }
                 if (!r.hasNext) {
                     setStatus(TaskStatus.DONE);
                 }
@@ -97,6 +122,68 @@ function Task({webTaskId}: Props) {
     if (taskId !== -1 && response.hasNext && hasNext && status != TaskStatus.DONE) {
         update();
     }
+
+    function getAllResults() {
+        if (allLength.size < 2) {
+            return null;
+        }
+        const values = allLength.values()
+        const numbers: number[] = new Array(allLength.size);
+        for (let i = 0; i < allLength.size; i++) {
+            const next = values.next().value as string;
+            numbers[i] = Number.parseFloat(next);
+        }
+        return <div className={"list-of-selected-points"}>
+            <p>Results: </p>
+            <p>{numbers.join(', ')}</p>
+        </div>;
+    }
+
+    const [connectId, setConnectId] = useState(-1);
+
+    function getTaskId() {
+        if (taskId != -1) {
+            return <p className={"task-status"}>Task id: {taskId}</p>;
+        }
+
+        function inputId(x: React.FormEvent<HTMLInputElement>) {
+            const currentTarget = x.currentTarget;
+            if (currentTarget == null || currentTarget.value == null) {
+                return;
+            }
+            const value = Number.parseInt(currentTarget.value);
+            setConnectId(value)
+        }
+
+        function connectToTask() {
+            if (connectId != -1) {
+                setStatus(TaskStatus.CONNECTING);
+                setTaskId(connectId);
+            }
+        }
+
+        return <div className="task-status task-connector">
+            <p>Task id: </p>
+            <input className={"connect-id-input"} onInput={x => inputId(x)} type="number"/>
+            <button onClick={connectToTask}>Connect</button>
+        </div>;
+    }
+
+    function getBetterThanPrevious() {
+        if (betterThanPrevious < 0) {
+            return null;
+        }
+        return <p className={"task-status"}>Better than previous: +{betterThanPrevious.toFixed(2)}% </p>;
+    }
+
+    function getBetterThanFirst() {
+        if (firstRes < 0) {
+            return null;
+        }
+        const betterThanFirst = (firstRes / pathLength - 1) * 100;
+        return <p className={"task-status"}>Better than first: +{betterThanFirst.toFixed(2)}% </p>;
+    }
+
     return (
         <div className={"task"}>
             <TaskConfiguration sendClicked={sendClicked} config={config} setConfig={setConfig}
@@ -107,13 +194,18 @@ function Task({webTaskId}: Props) {
                 <p>{coordinates.map(p => `(${p.x},${p.y})`).join(',')}</p>
             </div>
             <p className={"task-status"}>Status: {status.toString()}</p>
-            <p className={"task-status"}>Task id: {taskId}</p>
+
+            {getTaskId()}
             <p className={"task-status"}>Current iteration:{iteration} </p>
+            <p className={"task-status"}>Best path: {pathLength.toFixed(2)} </p>
+            {getBetterThanPrevious()}
+            {getBetterThanFirst()}
             <p className={"task-status"}>Message:{message} </p>
             <div className={"list-of-selected-points"}>
                 <p>Output: </p>
                 <p>{result.map(p => `(${p.x},${p.y})`).join(',')}</p>
             </div>
+            {getAllResults()}
         </div>
     );
 }
