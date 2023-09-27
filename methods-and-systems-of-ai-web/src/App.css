@@ -49,4 +49,6 @@
 .formStyle > button {
     width: 4rem;
 }
-
+button:hover{
+    cursor: pointer;
+}

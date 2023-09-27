@@ -3,6 +3,7 @@ import TaskConfiguration from "./TaskConfiguration";
 import {defaultConfig, defaultResponse, Point, PostTaskRequest, TaskStatus} from "../data/TaskData";
 import '../styles/Task.scss';
 import PathView from "./PathView";
+import {SERVER_URL} from "../data/Constants";
 
 interface Props {
     webTaskId: number;
@@ -14,7 +15,7 @@ interface Props {
 async function getTask(id: number) {
     let response: Response;
     try {
-        response = await fetch(`http://localhost:8080/api/v1/lab1/tasks/${id}`, {
+        response = await fetch(`${SERVER_URL}/api/v1/lab1/tasks/${id}`, {
             method: 'GET',
         });
     } catch (error) {
@@ -44,7 +45,7 @@ function Task({webTaskId}: Props) {
 
     async function createTask(request: PostTaskRequest) {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/lab1/tasks/', {
+            const response = await fetch(`${SERVER_URL}/api/v1/lab1/tasks/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ function Task({webTaskId}: Props) {
     }
 
     function sendClicked() {
-        if (TaskStatus.CREATE != status) {
+        if (TaskStatus.CREATE !== status) {
             return;
         }
         const mutationProbability = config.mutationProbability / 100;
@@ -84,7 +85,7 @@ function Task({webTaskId}: Props) {
         getTask(taskId)
             .then(x => x.json())
             .then(r => {
-                if (status == TaskStatus.CONNECTING) {
+                if (status === TaskStatus.CONNECTING) {
                     setStatus(TaskStatus.SUBMITTED);
                 }
                 setHasNext(r.hasNext)
@@ -119,7 +120,7 @@ function Task({webTaskId}: Props) {
         })
     }
 
-    if (taskId !== -1 && response.hasNext && hasNext && status != TaskStatus.DONE) {
+    if (taskId !== -1 && response.hasNext && hasNext && status !== TaskStatus.DONE) {
         update();
     }
 
@@ -142,7 +143,7 @@ function Task({webTaskId}: Props) {
     const [connectId, setConnectId] = useState(-1);
 
     function getTaskId() {
-        if (taskId != -1) {
+        if (taskId !== -1) {
             return <p className={"task-status"}>Task id: {taskId}</p>;
         }
 
@@ -156,7 +157,7 @@ function Task({webTaskId}: Props) {
         }
 
         function connectToTask() {
-            if (connectId != -1) {
+            if (connectId !== -1) {
                 setStatus(TaskStatus.CONNECTING);
                 setTaskId(connectId);
             }

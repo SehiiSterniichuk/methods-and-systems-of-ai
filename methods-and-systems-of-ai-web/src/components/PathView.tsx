@@ -2,6 +2,7 @@ import React, {MouseEvent, useEffect, useState} from 'react';
 import defaultImg from '../img/ukraine_admin_map.jpg';
 import '../styles/TaskConfiguration.scss';
 import {Point} from "../data/TaskData";
+import DatasetManager from "./DatasetManager";
 
 interface Props {
     imgSource?: string;
@@ -103,8 +104,12 @@ function PathView({coordinates, calculatedPath, setCoordinates, imgSource = defa
     }
 
     const svg = coordinates.length < 2 ? null : getSvg();
+
+
+
     return (
         <div className="path-view">
+            <DatasetManager setPoints={setCoordinates} points={coordinates}/>
             <p>Point number: {coordinates.length}</p>
             <p>X: {position.x} Y: {position.y}</p>
             <div className="img_wrapper"
