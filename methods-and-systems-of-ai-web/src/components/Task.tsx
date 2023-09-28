@@ -207,6 +207,20 @@ function Task({webTaskId}: Props) {
         return <p className={"task-status"}>Better than first: +{betterThanFirst.toFixed(2)}% </p>;
     }
 
+    function makeAChart() {
+        if(status != TaskStatus.DONE){
+            return null;
+        }
+        return <img className={"chart-img"} src={`${SERVER_URL}/api/v1/lab1/chart/generate/${taskId}`} alt="chart"/>;
+    }
+
+    function getLastSuccessfulIteration() {
+        if(statistics.length < 1){
+            return null;
+        }
+        return <p className={"task-status"}>Last successful iteration: {statistics[statistics.length - 1].iteration}</p>
+    }
+
     return (
         <div className={"task"}>
             <TaskConfiguration sendClicked={sendClicked} config={config} setConfig={setConfig}
@@ -223,12 +237,14 @@ function Task({webTaskId}: Props) {
             <p className={"task-status"}>Best path: {pathLength.toFixed(2)} </p>
             {getBetterThanPrevious()}
             {getBetterThanFirst()}
+            {getLastSuccessfulIteration()}
             <p className={"task-status"}>Message:{message} </p>
             <div className={"list-of-selected-points"}>
                 <p>Output: </p>
                 <p>{result.map(p => `(${p.x},${p.y})`).join(',')}</p>
             </div>
             {getAllResults()}
+            {makeAChart()}
         </div>
     );
 }

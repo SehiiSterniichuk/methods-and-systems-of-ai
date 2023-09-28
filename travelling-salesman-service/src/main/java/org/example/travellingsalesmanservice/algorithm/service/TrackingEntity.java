@@ -50,5 +50,4 @@ public class TrackingEntity {
                 .hasNext(false)
                 .build();
     }
-
 }

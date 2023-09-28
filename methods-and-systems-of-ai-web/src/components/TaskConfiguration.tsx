@@ -21,6 +21,21 @@ export type TaskInput = {
 function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props,) {
 
 
+    function setPercent(x: React.FormEvent<HTMLInputElement>) {
+        const currentTarget = x.currentTarget;
+        if (currentTarget == null || currentTarget.value == null) {
+            return;
+        }
+        let percent = Number.parseInt(currentTarget.value);
+        if (percent == null) {
+            return;
+        }
+        setConfig(c => {
+            const newConfig: TaskConfig = {...c, searcherConfig: {...c.searcherConfig, diffPercent: percent}};
+            return newConfig;
+        });
+    }
+
     const inputs: TaskInput[] =
         [
             {
@@ -51,6 +66,13 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
                 setter: setAllowed,
                 min: 0,
                 max: 10_000
+            },
+            {
+                name: "Difference %",
+                defaultValue: config.searcherConfig.diffPercent,
+                setter: setPercent,
+                min: 0,
+                max: 90
             },
         ]
 
@@ -172,6 +194,7 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
             </div>
         );
     }
+
     function selectDistanceType() {
         function setDistanceType(x: React.ChangeEvent<HTMLSelectElement>) {
             if (x.currentTarget == null) return;
@@ -197,6 +220,7 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
             </div>
         );
     }
+
     const [showButton, setShowButton] = useState(true);
 
     function onClickButton() {

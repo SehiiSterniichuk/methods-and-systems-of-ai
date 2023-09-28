@@ -14,6 +14,10 @@ public record Chromosome(int[] x, int[] y) {
         System.arraycopy(source.y, sourceStart, y, start, length);
     }
 
+    public Point getPoint(int i) {
+        return new Point(x[i], y[i]);
+    }
+
     public int size() {
         return x.length;
     }
@@ -87,5 +91,10 @@ public record Chromosome(int[] x, int[] y) {
             }
         }
         return true;
+    }
+
+    public void setPoint(int i, Point p2) {
+        x[i] = p2.x();
+        y[i] = p2.y();
     }
 }

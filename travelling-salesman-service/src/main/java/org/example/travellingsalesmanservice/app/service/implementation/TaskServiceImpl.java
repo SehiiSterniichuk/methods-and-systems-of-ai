@@ -38,8 +38,14 @@ public class TaskServiceImpl implements TaskService {
         TravellingSalesmanSolver solver = factory.getGeneticSolver(config, dataset, entity);
         var future = executor.submit(solver::start);
         String id = taskService.createTask(config, dataset);
+        log.info(STR. "new task with id: \{ id }" );
         map.put(id, new TrackingEntityWrapper(entity, future));
         log.info("Submitted task with id: {}", id);
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return new TaskId(id);
     }
 
@@ -47,12 +53,15 @@ public class TaskServiceImpl implements TaskService {
     @SuppressWarnings("preview")
     public ResultResponse getTask(String id) {
         var entity = map.get(id);
+        log.info(STR. "get id: \{ id }" );
         if (entity == null) {
             throw new IllegalStateException(STR. "task with id: \{ id } not found" );
         }
         ResultResponse resultResponse = entity.e.get();
+        log.info(STR. "get resultresponse id: \{ id }" );
         if (!resultResponse.hasNext()) {
             lastResult(id, entity);
+            taskService.updateTask(id, resultResponse);
         }
         if (entity.f.state() == Future.State.FAILED) {
             resultResponse = failedTask(id, entity, resultResponse);
@@ -71,6 +80,7 @@ public class TaskServiceImpl implements TaskService {
                 .message(resultResponse.message() + " " + message)
                 .build();
         taskService.addMessage(id, message);
+        removeAfterTime(id);
         return resultResponse;
     }
 
@@ -84,5 +94,17 @@ public class TaskServiceImpl implements TaskService {
         }
         log.info(message);
         taskService.addMessage(id, message);
+        removeAfterTime(id);
+    }
+    //todo try to delete this:)
+    private void removeAfterTime(String id) {
+        executor.execute(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            map.remove(id);
+        });
     }
 }
