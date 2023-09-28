@@ -9,9 +9,21 @@ interface Props {
     datasetName: string
     setDatasetName: (value: (((prevState: string) => string) | string)) => void
     img: string
+    datasetOptions?: string[]
+    formId: string
 }
 
-function DatasetForm({setOpen, img, onClick, setDatasetName, datasetName, setStatusImage, statusImage}: Props) {
+function DatasetForm({
+                         setOpen,
+                         datasetOptions = [],
+                         formId,
+                         img,
+                         onClick,
+                         setDatasetName,
+                         datasetName,
+                         setStatusImage,
+                         statusImage
+                     }: Props) {
     function writeDatasetName(e: React.FormEvent<HTMLInputElement>) {
         if (e.currentTarget == null || e.currentTarget.value == null) {
             return
@@ -27,9 +39,13 @@ function DatasetForm({setOpen, img, onClick, setDatasetName, datasetName, setSta
         setOpen(false)
     }
 
+    const listID = "datalist " + formId;
     return <div className="save-points-form">
         <p>Save dataset with name: </p>
-        <input type="text" defaultValue={datasetName} onInput={e => writeDatasetName(e)}/>
+        <input type="text" id={"input " + formId} list={listID} defaultValue={datasetName} onInput={e => writeDatasetName(e)}/>
+        <datalist id={listID}>
+            {datasetOptions.map(o=> <option value={o}>{o}</option>)}
+        </datalist>
         <button className={"suggestion-button"} onClick={onClick}><img src={img}
                                                                        alt="submit form of saving dataset"/>
         </button>

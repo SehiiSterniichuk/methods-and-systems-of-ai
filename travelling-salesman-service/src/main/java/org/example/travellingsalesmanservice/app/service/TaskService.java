@@ -9,5 +9,5 @@ import org.example.travellingsalesmanservice.app.domain.TaskConfig;
 public interface TaskService {
     TaskId createTask(TaskConfig config, Dataset dataset);
 
-    ResultResponse getTask(Long id);
+    ResultResponse getTask(String id);
 }

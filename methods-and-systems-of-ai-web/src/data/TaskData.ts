@@ -14,20 +14,7 @@ export const enum TaskStatus {
     DONE = "DONE",
 }
 
-export type TaskConfig = {
-    iterationNumber: number;
-    allowedNumberOfGenerationsWithTheSameResult: number;
-    showEachIterationStep: number;
-    populationSize: number;
-    mutationProbability: number;
-};
-export const defaultConfig: TaskConfig = {
-    iterationNumber: 1000,
-    allowedNumberOfGenerationsWithTheSameResult: 10,
-    showEachIterationStep: 10,
-    populationSize: 20,
-    mutationProbability: 10,
-}
+
 export type Point = {
     x: number;
     y: number;
@@ -58,9 +45,54 @@ export type ResultResponse = {
     message: string;
 };
 
-export const defaultResponse:ResultResponse = {
+export const defaultResponse: ResultResponse = {
     result: {path: [], pathLength: -1},
     currentIteration: -1,
     hasNext: true,
     message: "",
 }
+
+export type SearcherConfig = {
+    distance: Distance;
+    breedingType: BreedingType;
+    diffPercent: number;
+}
+
+export enum Distance {
+    HAMMING = "HAMMING",
+    SCALAR = "SCALAR",
+}
+
+export enum BreedingType {
+    INBREEDING = "INBREEDING",
+    OUTBREEDING = "OUTBREEDING",
+}
+
+export type TaskConfig = {
+    iterationNumber: number;
+    allowedNumberOfGenerationsWithTheSameResult: number;
+    showEachIterationStep: number;
+    populationSize: number;
+    mutationProbability: number;
+    searcherConfig: SearcherConfig
+};
+export const defaultSearchConfig: SearcherConfig = {
+    breedingType: BreedingType.INBREEDING,
+    diffPercent: 10,
+    distance: Distance.SCALAR,
+};
+export const defaultConfig: TaskConfig = {
+    iterationNumber: 1000,
+    allowedNumberOfGenerationsWithTheSameResult: 10,
+    showEachIterationStep: 10,
+    populationSize: 20,
+    mutationProbability: 10,
+    searcherConfig: defaultSearchConfig
+}
+export type Statistic = {
+    iteration: number;
+    path: number;
+    points: Point[];
+}
+
+export default SearcherConfig;

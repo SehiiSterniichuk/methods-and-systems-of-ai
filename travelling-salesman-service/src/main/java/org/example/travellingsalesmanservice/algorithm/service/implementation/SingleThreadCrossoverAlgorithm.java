@@ -1,26 +1,27 @@
 package org.example.travellingsalesmanservice.algorithm.service.implementation;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.example.travellingsalesmanservice.algorithm.service.CrossoverAlgorithm;
 import org.example.travellingsalesmanservice.algorithm.domain.Chromosome;
 import org.example.travellingsalesmanservice.algorithm.service.CrossoverMethod;
 import org.example.travellingsalesmanservice.algorithm.service.Mutation;
 import org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher;
-import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
 import static org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher.PARENT_NOT_FOUND;
 
 @RequiredArgsConstructor
-@Component
+@Builder
 public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
     private final CrossoverMethod crossoverMethod;
     private final Mutation mutation;
+    private final SecondParentSearcher searcher;
     private final Random rand = new Random();
 
     @Override
-    public void crossover(Chromosome p, int[] pathLengths, SecondParentSearcher searcher, float mutationProbability) {
+    public void performCrossover(Chromosome p, int[] pathLengths, float mutationProbability) {
         int chromosomeLength = (p.x().length - 1) / pathLengths.length;
         Chromosome child1 = Chromosome.ofLength(chromosomeLength);
         Chromosome child2 = Chromosome.ofLength(chromosomeLength);
@@ -36,7 +37,7 @@ public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
                 processedParentsCounter++;
                 continue;
             }
-            int j = searcher.findSecond(i, pathLengths);
+            int j = searcher.findSecond(i);
             int p1 = i * chromosomeLength;
             int p2 = j * chromosomeLength;
             if (j == PARENT_NOT_FOUND || p.equalsSubChromosomes(p1, p2, chromosomeLength)) {
@@ -57,10 +58,5 @@ public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
 
     private boolean isMutation(float probability) {
         return rand.nextFloat(1) < probability;
-    }
-
-    @Override
-    public void crossover(Chromosome p, int[] pathLengths, SecondParentSearcher searcher) {
-        crossover(p, pathLengths, searcher, 0.1f);
     }
 }

@@ -1,7 +1,7 @@
 package org.example.travellingsalesmanservice.app.controllers;
 
-import jakarta.annotation.Nonnull;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.example.travellingsalesmanservice.app.domain.PostTaskRequest;
 import org.example.travellingsalesmanservice.algorithm.domain.TaskId;
@@ -21,7 +21,7 @@ public class TaskController {
     }
 
     @GetMapping("{id}")
-    public ResultResponse getTask(@PathVariable @Nonnull Long id){
+    public ResultResponse getTask(@PathVariable @Valid @NotBlank String id){
         return service.getTask(id);
     }
 }

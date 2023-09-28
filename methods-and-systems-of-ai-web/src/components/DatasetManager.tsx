@@ -81,6 +81,7 @@ function DatasetManager({points, setPoints}: Props) {
 
     function getDatasetForm() {
         return <DatasetForm img={saveImg} datasetName={saverDatasetName} onClick={saveClick}
+                            formId={"database_save_form"}
                             statusImage={saverStatusImage}
                             setOpen={setOpenSaver}
                             setStatusImage={setSaverStatusImage}
@@ -178,8 +179,10 @@ function DatasetManager({points, setPoints}: Props) {
         }
 
         return <div>
-            <p>{getDatabaseStatus()}</p>
+            <p className={"fetch-database-status"}>{getDatabaseStatus()}</p>
             <DatasetForm img={downloadImg} datasetName={loaderDatasetName} onClick={loadClick}
+                         datasetOptions={savedDatasetsList}
+                         formId={"database_fetch_form"}
                          statusImage={loaderStatusImage}
                          setOpen={setOpenLoader}
                          setStatusImage={setLoaderStatusImage}

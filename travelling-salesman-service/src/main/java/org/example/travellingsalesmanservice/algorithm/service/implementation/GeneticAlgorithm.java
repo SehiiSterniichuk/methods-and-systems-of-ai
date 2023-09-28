@@ -1,80 +1,88 @@
 package org.example.travellingsalesmanservice.algorithm.service.implementation;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.travellingsalesmanservice.algorithm.domain.*;
-import org.example.travellingsalesmanservice.algorithm.service.PathLengthEstimator;
-import org.example.travellingsalesmanservice.algorithm.service.TrackingEntity;
-import org.example.travellingsalesmanservice.algorithm.service.TravellingSalesmanSolver;
-import org.example.travellingsalesmanservice.algorithm.service.XYPopulationGenerator;
+import org.example.travellingsalesmanservice.algorithm.domain.Chromosome;
+import org.example.travellingsalesmanservice.algorithm.domain.Dataset;
+import org.example.travellingsalesmanservice.algorithm.domain.Point;
+import org.example.travellingsalesmanservice.algorithm.domain.Result;
+import org.example.travellingsalesmanservice.algorithm.service.*;
 import org.example.travellingsalesmanservice.app.domain.TaskConfig;
-import org.springframework.stereotype.Component;
 
-import static java.lang.StringTemplate.STR;
+import static org.example.travellingsalesmanservice.app.domain.ResultResponse.*;
 
 @RequiredArgsConstructor
-@Component
 @Slf4j
+@Builder
 class GeneticAlgorithm implements TravellingSalesmanSolver {
     private final PathLengthEstimator estimator;
     private final XYPopulationGenerator generator;
+    private final CrossoverFactory crossoverFactory;
+    private final TrackingEntity entity;
+    private final int[] pathLengths;
+    private final Dataset dataset;
+    private final TaskConfig taskConfig;
 
     @Override
-    public TrackingEntity start(Dataset dataset, AlgorithmConfiguration configuration) {
-        if (dataset.data().length < 4) {
-            handleSimpleTask(dataset, configuration);
-            return configuration.trackingEntity();
+    public TrackingEntity start() {
+        if (isSimple(dataset)) {
+            handleSimpleTask();
+            return entity;
         }
-        var taskConfig = configuration.taskConfig();
-        var entity = configuration.trackingEntity();
         var chromosomes = generator.generateChromosomes(dataset, taskConfig.populationSize());
-        var pathLengths = new int[taskConfig.populationSize()];
         estimator.calculateSquaredPathLength(chromosomes, pathLengths);
         try {
-            start(configuration, chromosomes, pathLengths, taskConfig, entity);
+            start(chromosomes, crossoverFactory.getCrossover(taskConfig, pathLengths, chromosomes));
         } catch (RuntimeException e) {
-            entity.putFinish(null, -1, e.getMessage());
+            entity.put(getErrorResult(e.getMessage(), -1));
             throw e;
         }
         return entity;
     }
 
-    private void start(AlgorithmConfiguration configuration, Chromosome chromosomes,
-                       int[] pathLengths, TaskConfig taskConfig, TrackingEntity entity) {
+
+
+    public static boolean isSimple(Dataset dataset) {
+        return dataset.data().length < 4;
+    }
+
+    protected void start(Chromosome chromosomes, CrossoverAlgorithm crossover) {
         int counterOfSameResults = 0;
         Result bestResult = findBestPath(chromosomes, pathLengths);
         int i = 0;
         for (; i < taskConfig.iterationNumber(); i++) {
-            configuration.crossoverAlgorithm().crossover(chromosomes, pathLengths, configuration.searcher(),
-                    configuration.taskConfig().mutationProbability());
+            crossover.performCrossover(chromosomes, pathLengths, taskConfig.mutationProbability());
             estimator.calculateSquaredPathLength(chromosomes, pathLengths);
-            var currentResult = findBestPath(chromosomes, pathLengths);
-            if (currentResult.isBetterThan(bestResult)) {
-                bestResult = currentResult;
+            var current = findBestPath(chromosomes, pathLengths);
+            if (current.isBetterThan(bestResult)) {
+                bestResult = current;
                 counterOfSameResults = 0;
-                entity.put(bestResult, i, "New best result");
+                entity.put(getNewBestResult(bestResult, i));
             } else if (counterOfSameResults < taskConfig.allowedNumberOfGenerationsWithTheSameResult()) {
                 counterOfSameResults++;
             } else {
-                entity.putFinish(bestResult, i, STR."Finished. Counter of the same result: \{counterOfSameResults}");
+                entity.put(getResultCounter(bestResult, i, counterOfSameResults));
                 break;
             }
             boolean show = i % taskConfig.showEachIterationStep() == 0;
             boolean finish = i + 1 == taskConfig.iterationNumber();
             if (show && !finish) {
-                entity.put(bestResult, i, "Show iteration");
+                String chromosomesString = chromosomes.toString(0, chromosomes.size() / pathLengths.length);
+                log.debug(chromosomesString);
+                entity.put(getShowResult(bestResult, i));
             } else if (finish) {
-                entity.putFinish(bestResult, i, STR."Finished all iterations.");
+                entity.put(getFinishResult(bestResult, i));
             }
         }
     }
 
-    private void handleSimpleTask(Dataset dataset, AlgorithmConfiguration configuration) {
+    private void handleSimpleTask() {
         Result result = Result.builder()
                 .path(dataset.data())
                 .pathLength(calculatePath(dataset.data()))
                 .build();
-        configuration.trackingEntity().putFinish(result, 0);
+        entity.put(getFinishResult(result, 0));
     }
 
     private double calculatePath(Point[] data) {

@@ -1,4 +1,6 @@
 package org.example.travellingsalesmanservice.algorithm.domain;
 
-public record TaskId(String id) {
+public enum BreedingType {
+    INBREEDING,
+    OUTBREEDING
 }

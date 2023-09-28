@@ -30,29 +30,8 @@ public class TrackingEntity {
     }
 
     @SneakyThrows
-    public void put(Result result, int currentIteration, String message) {
-        put(result, currentIteration, message, true);
-    }
-
-    @SneakyThrows
-    public void putFinish(Result result, int currentIteration) {
-        putFinish(result, currentIteration, null);
-    }
-
-    @SneakyThrows
-    public void putFinish(Result result, int currentIteration, String message) {
-        put(result, currentIteration, message, false);
-    }
-
-    @SneakyThrows
-    public void put(Result result, int currentIteration, String message, boolean hasNext) {
-        var r = ResultResponse.builder()
-                .result(result)
-                .currentIteration(currentIteration)
-                .message(message)
-                .hasNext(hasNext)
-                .build();
-        queue.put(r);
+    public void put(ResultResponse result) {
+        queue.put(result);
     }
 
 

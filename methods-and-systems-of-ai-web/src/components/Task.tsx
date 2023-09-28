@@ -1,6 +1,14 @@
 import React, {useState} from 'react';
 import TaskConfiguration from "./TaskConfiguration";
-import {defaultConfig, defaultResponse, Point, PostTaskRequest, TaskStatus} from "../data/TaskData";
+import {
+    defaultConfig,
+    defaultResponse,
+    Point,
+    PostTaskRequest,
+    ResultResponse,
+    Statistic,
+    TaskStatus
+} from "../data/TaskData";
 import '../styles/Task.scss';
 import PathView from "./PathView";
 import {SERVER_URL} from "../data/Constants";
@@ -12,10 +20,26 @@ interface Props {
 // Function to create a task
 
 
-async function getTask(id: number) {
+async function getTask(id: string) {
     let response: Response;
     try {
         response = await fetch(`${SERVER_URL}/api/v1/lab1/tasks/${id}`, {
+            method: 'GET',
+        });
+    } catch (error) {
+        throw error;
+    }
+    if (!response.ok) {
+        response.text().then(t => console.log(`HTTP error! body: ${t}`))
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response;
+}
+
+async function fetchStatistic(id: string) {
+    let response: Response;
+    try {
+        response = await fetch(`${SERVER_URL}/api/v1/lab1/task-storage/statistic/${id}`, {
             method: 'GET',
         });
     } catch (error) {
@@ -34,12 +58,12 @@ function Task({webTaskId}: Props) {
     const [result, setResult] = useState<Point[]>([]);
     const [pathLength, setPathLength] = useState(-1.0);
     const [betterThanPrevious, setBetterThanPrevious] = useState(-1.0);
-    const [firstRes, setFirstRes] = useState(-1.0);
-    const [allLength, setAllLength] = useState<Set<string>>(new Set());
+    const [betterThanFirst, setBetterThanFirstRes] = useState(-1.0);
+    const [statistics, setStatistics] = useState<Statistic[]>([]);
     const [hasNext, setHasNext] = useState(true);
     const [message, setMessage] = useState("");
     const [iteration, setIteration] = useState(-1);
-    const [taskId, setTaskId] = useState<number>(-1);
+    const [taskId, setTaskId] = useState<string>("-1");
     const [config, setConfig] = useState(defaultConfig);
     const [response, setResponse] = useState(defaultResponse);
 
@@ -82,29 +106,35 @@ function Task({webTaskId}: Props) {
     }
 
     function update() {
+        function updateStatistics() {
+            fetchStatistic(taskId)
+                .then(x => x.json())
+                .then(x => x as Statistic[])
+                .then(list => {
+                    list.sort((x, y) => {
+                        return x.iteration - y.iteration
+                    })
+                    setStatistics(list);
+                    if (list.length >= 2) {
+                        const last = list[list.length - 1].path;
+                        setBetterThanPrevious(((last / list[list.length - 2].path) - 1) * 100);
+                        setBetterThanFirstRes(((list[0].path / last) - 1) * 100)
+                    }
+                })
+        }
+
         getTask(taskId)
             .then(x => x.json())
+            .then(r=>r as ResultResponse)
             .then(r => {
                 if (status === TaskStatus.CONNECTING) {
                     setStatus(TaskStatus.SUBMITTED);
                 }
                 setHasNext(r.hasNext)
                 setResult(r.result.path)
-                const newPathLength = r.result.pathLength as number;
-                const newPathLengthStr = newPathLength.toFixed(2);
-                if (!allLength.has(newPathLengthStr)) {
-                    console.log("newPathLength: " + newPathLength + " old: " + pathLength)
-                    if (pathLength > 0) {
-                        setBetterThanPrevious((pathLength / newPathLength - 1) * 100);
-                    } else {
-                        setFirstRes(newPathLength);
-                    }
-                    setPathLength(newPathLength)
-                    setAllLength(() => {
-                        const set = new Set(allLength);
-                        set.add(newPathLengthStr);
-                        return set;
-                    });
+                setPathLength(r.result.pathLength as number)
+                if (r.message.includes("best")) {
+                    updateStatistics();
                 }
                 if (!r.hasNext) {
                     setStatus(TaskStatus.DONE);
@@ -120,30 +150,24 @@ function Task({webTaskId}: Props) {
         })
     }
 
-    if (taskId !== -1 && response.hasNext && hasNext && status !== TaskStatus.DONE) {
+    if (taskId !== "-1" && response.hasNext && hasNext && status !== TaskStatus.DONE) {
         update();
     }
 
     function getAllResults() {
-        if (allLength.size < 2) {
+        if (statistics.length < 2) {
             return null;
-        }
-        const values = allLength.values()
-        const numbers: number[] = new Array(allLength.size);
-        for (let i = 0; i < allLength.size; i++) {
-            const next = values.next().value as string;
-            numbers[i] = Number.parseFloat(next);
         }
         return <div className={"list-of-selected-points"}>
             <p>Results: </p>
-            <p>{numbers.join(', ')}</p>
+            <p>{statistics.map(x=>x.path.toFixed(2)).join(', ')}</p>
         </div>;
     }
 
-    const [connectId, setConnectId] = useState(-1);
+    const [connectId, setConnectId] = useState("-1");
 
     function getTaskId() {
-        if (taskId !== -1) {
+        if (taskId !== "-1") {
             return <p className={"task-status"}>Task id: {taskId}</p>;
         }
 
@@ -152,12 +176,11 @@ function Task({webTaskId}: Props) {
             if (currentTarget == null || currentTarget.value == null) {
                 return;
             }
-            const value = Number.parseInt(currentTarget.value);
-            setConnectId(value)
+            setConnectId(currentTarget.value)
         }
 
         function connectToTask() {
-            if (connectId !== -1) {
+            if (connectId !== "-1") {
                 setStatus(TaskStatus.CONNECTING);
                 setTaskId(connectId);
             }
@@ -178,10 +201,9 @@ function Task({webTaskId}: Props) {
     }
 
     function getBetterThanFirst() {
-        if (firstRes < 0) {
+        if (betterThanFirst < 0) {
             return null;
         }
-        const betterThanFirst = (firstRes / pathLength - 1) * 100;
         return <p className={"task-status"}>Better than first: +{betterThanFirst.toFixed(2)}% </p>;
     }
 

@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.algorithm.domain;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public record Chromosome(int[] x, int[] y) {
@@ -37,6 +38,30 @@ public record Chromosome(int[] x, int[] y) {
                 "x=" + Arrays.toString(x) +
                 ", y=" + Arrays.toString(y) +
                 '}';
+    }
+
+    @SuppressWarnings("preview")
+    public String toString(int N, int chromosomeLength) {
+        assert N <= x.length;
+        return STR. """
+                Chromosome [\{ N } elements] {
+                x={\{ collectWholeChromosome(x, N, chromosomeLength) }}
+                y={\{ collectWholeChromosome(y, N, chromosomeLength) }}
+                }
+                """ ;
+    }
+
+    private String collectWholeChromosome(int[] array, int N, int chromosomeLength) {
+        return IntStream.range(0, N / chromosomeLength)
+                .mapToObj(i -> toStringChromosome(array, chromosomeLength * i, chromosomeLength))
+                .collect(Collectors.joining(","));
+    }
+
+    private String toStringChromosome(int[] array, int start, int length) {
+        String collected = IntStream.range(start, start + length)
+                .mapToObj(i -> array[i] + "")
+                .collect(Collectors.joining(","));
+        return STR. "[\{ collected }]" ;
     }
 
     public void setFrom(int i, Chromosome parent) {
