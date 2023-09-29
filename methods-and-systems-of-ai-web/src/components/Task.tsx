@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
 import TaskConfiguration from "./TaskConfiguration";
 import {
-    defaultConfig,
     defaultResponse,
     Point,
     PostTaskRequest,
     ResultResponse,
-    Statistic,
+    Statistic, TaskConfig,
     TaskStatus
 } from "../data/TaskData";
 import '../styles/Task.scss';
@@ -15,6 +14,7 @@ import {SERVER_URL} from "../data/Constants";
 
 interface Props {
     webTaskId: number;
+    defaultConfig: TaskConfig
 }
 
 // Function to create a task
@@ -52,7 +52,7 @@ async function fetchStatistic(id: string) {
     return response;
 }
 
-function Task({webTaskId}: Props) {
+function Task({webTaskId, defaultConfig}: Props) {
     const [status, setStatus] = useState(TaskStatus.CREATE);
     const [coordinates, setCoordinates] = useState<Point[]>([]);
     const [result, setResult] = useState<Point[]>([]);

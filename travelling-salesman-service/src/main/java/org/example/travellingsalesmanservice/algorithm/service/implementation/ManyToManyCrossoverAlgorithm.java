@@ -14,7 +14,7 @@ import static org.example.travellingsalesmanservice.algorithm.service.SecondPare
 
 @RequiredArgsConstructor
 @Builder
-public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
+public class ManyToManyCrossoverAlgorithm implements CrossoverAlgorithm {
     private final CrossoverMethod crossoverMethod;
     private final Mutation mutation;
     private final SecondParentSearcher searcher;
@@ -40,10 +40,15 @@ public class SingleThreadCrossoverAlgorithm implements CrossoverAlgorithm {
             int j = searcher.findSecond(i);
             int p1 = i * chromosomeLength;
             int p2 = j * chromosomeLength;
-            if (j == PARENT_NOT_FOUND || p.equalsSubChromosomes(p1, p2, chromosomeLength)) {
+            if (j == PARENT_NOT_FOUND) {
                 mutation.mutate(p, p1, chromosomeLength);
                 pathLengths[i] = -1;
                 processedParentsCounter++;
+                continue;
+            } else if (p.equalsSubChromosomes(p1, p2, chromosomeLength)) {
+                mutation.mutate(p, p1, chromosomeLength);
+                pathLengths[i] = pathLengths[j] = -1;
+                processedParentsCounter += 2;
                 continue;
             }
             parent1.fillWith(0, p, p1, chromosomeLength);

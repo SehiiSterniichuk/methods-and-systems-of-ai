@@ -24,6 +24,11 @@ public class CrossoverAlgorithmFactory {
             case ONE_POINT -> onePointCrossoverMethod;
         };
         SecondParentSearcher searcher = searcherFactory.getSearcher(config.searcherConfig(), pathLengths, chromosome);
-        return new SingleThreadCrossoverAlgorithm(crossoverMethod, new RandomGeneMutation(new Random()), searcher);
+        RandomGeneMutation mutation = new RandomGeneMutation(new Random());
+        return new ManyToManyCrossoverAlgorithm(crossoverMethod, mutation, searcher);
+//        return OneToManyCrossoverAlgorithm.builder()
+//                .crossoverMethod(crossoverMethod)
+//                .mutation(mutation)
+//                .build();
     }
 }

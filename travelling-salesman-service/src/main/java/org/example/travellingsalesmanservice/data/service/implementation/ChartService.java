@@ -58,6 +58,10 @@ public class ChartService {
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         renderer.setSeriesPaint(0, Color.blue);
         renderer.setSeriesStroke(0, new BasicStroke(2.0f));
+        double min = statistics.getLast().path();
+        double max = statistics.getFirst().path();
+        double diff = 0.005;
+        plot.getRangeAxis().setRange(min - min * diff, max + max * diff);
 
         plot.setRenderer(renderer);
 

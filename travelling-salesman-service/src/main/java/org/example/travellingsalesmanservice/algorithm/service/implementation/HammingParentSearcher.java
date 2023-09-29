@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.travellingsalesmanservice.algorithm.domain.Chromosome;
 import org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher;
 
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
@@ -17,11 +18,12 @@ public class HammingParentSearcher implements SecondParentSearcher {
     @Override
     public int findSecond(int firstParentIndex) {
         int start = firstParentIndex + 1;
-        return IntStream.range(start, pathLengths.length)
+        OptionalInt inRangeParent = IntStream.range(start, pathLengths.length)
                 .parallel()
                 .filter(i -> pathLengths[i] > 0)
                 .filter(i -> isRange(firstParentIndex, i))
-                .findAny()
+                .findAny();
+        return inRangeParent
                 .orElse(IntStream.range(start, pathLengths.length)
                         .parallel()
                         .filter(i -> pathLengths[i] > 0)

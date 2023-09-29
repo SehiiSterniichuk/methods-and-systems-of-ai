@@ -13,7 +13,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
-class SingleThreadCrossoverAlgorithmTest {
+class ManyToManyCrossoverAlgorithmTest {
 
     @Test
     public void simpleTest() {
@@ -28,7 +28,7 @@ class SingleThreadCrossoverAlgorithmTest {
                 .distance(Distance.SCALAR)
                 .build();
         var searcher = (new SearcherFactory()).getSearcher(config, paths, chromosome);
-        var crossoverMethod = SingleThreadCrossoverAlgorithm.builder()
+        var crossoverMethod = ManyToManyCrossoverAlgorithm.builder()
                 .crossoverMethod(new CycleCrossoverMethod())
                 .searcher(searcher)
                 .mutation(new RandomGeneMutation(new Random()))

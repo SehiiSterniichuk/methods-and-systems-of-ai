@@ -55,12 +55,13 @@ public class TaskServiceImpl implements TaskService {
         log.debug(STR. "get id: \{ id }" );
         if (entity == null) {
             throw new IllegalStateException(STR. "task with id: \{ id } not found" );
+        } else if (entity.e.isLastResultHasTaken()) {
+            throw new IllegalStateException(STR. "task with id: \{ id } has received its last result" );
         }
         ResultResponse resultResponse = entity.e.get();
-        log.info(STR. "get resultresponse id: \{ id }" );
+        log.debug(STR. "get resultresponse id: \{ id }" );
         if (!resultResponse.hasNext()) {
             lastResult(id, entity);
-            taskService.updateTask(id, resultResponse);
         }
         if (entity.f.state() == Future.State.FAILED) {
             resultResponse = failedTask(id, entity, resultResponse);
@@ -93,8 +94,8 @@ public class TaskServiceImpl implements TaskService {
         }
         log.info(message);
         taskService.addMessage(id, message);
-        removeAfterTime(id);
     }
+
     //todo try to delete this:)
     private void removeAfterTime(String id) {
         executor.execute(() -> {

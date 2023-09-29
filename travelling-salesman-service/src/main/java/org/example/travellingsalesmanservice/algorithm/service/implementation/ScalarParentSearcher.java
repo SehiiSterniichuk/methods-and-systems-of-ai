@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher;
 
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -19,11 +20,12 @@ public class ScalarParentSearcher implements SecondParentSearcher {
         int min = (int) (first - first * diff);
         int max = (int) (first + first * diff);
         int start = firstParentIndex + 1;
-        return IntStream.range(start, pathLengths.length)
+        OptionalInt inRangeValue = IntStream.range(start, pathLengths.length)
                 .parallel()
                 .filter(i -> pathLengths[i] > 0)
                 .filter(i -> isRange(i, min, max))
-                .findAny()
+                .findAny();
+        return inRangeValue
                 .orElse(IntStream.range(start, pathLengths.length)
                         .parallel()
                         .filter(i -> pathLengths[i] > 0)

@@ -58,7 +58,7 @@ function DatasetManager({points, setPoints}: Props) {
     const [saverDatasetName, setSaverDatasetName] = useState("");
     const [saverStatusImage, setSaverStatusImage] = useState("");
     const [isOpenLoader, setOpenLoader] = useState(false);
-    const [loaderDatasetName, setLoaderDatasetName] = useState("");
+    const [loaderDatasetName, setLoaderDatasetName] = useState("simple64");
     const [loaderStatusImage, setLoaderStatusImage] = useState("");
     const [savedDatasetsList, setSavedDatasetsList] = useState<string[]>([])
     const [fetchStatus, setFetchStatus] = useState(FetchAllStatus.NONE);
