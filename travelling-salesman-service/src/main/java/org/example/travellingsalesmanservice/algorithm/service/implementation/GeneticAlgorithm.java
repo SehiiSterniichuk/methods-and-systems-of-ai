@@ -18,7 +18,7 @@ import static org.example.travellingsalesmanservice.app.domain.ResultResponse.*;
 class GeneticAlgorithm implements TravellingSalesmanSolver {
     private final PathLengthEstimator estimator;
     private final XYPopulationGenerator generator;
-    private final CrossoverFactory crossoverFactory;
+    private final CrossoverAlgorithmFactory crossoverAlgorithmFactory;
     private final TrackingEntity entity;
     private final int[] pathLengths;
     private final Dataset dataset;
@@ -33,7 +33,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
         var chromosomes = generator.generateChromosomes(dataset, taskConfig.populationSize());
         estimator.calculateSquaredPathLength(chromosomes, pathLengths);
         try {
-            start(chromosomes, crossoverFactory.getCrossover(taskConfig, pathLengths, chromosomes));
+            start(chromosomes, crossoverAlgorithmFactory.getCrossover(taskConfig, pathLengths, chromosomes));
         } catch (RuntimeException e) {
             entity.put(getErrorResult(e.getMessage(), -1));
             throw e;

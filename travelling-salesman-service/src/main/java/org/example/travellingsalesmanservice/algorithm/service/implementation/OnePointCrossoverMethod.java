@@ -15,7 +15,7 @@ public class OnePointCrossoverMethod implements CrossoverMethod {
         int length = parent1.size();
         Set<Point> uniquePointsChild1 = new HashSet<>(length);
         Set<Point> uniquePointsChild2 = new HashSet<>(length);
-        // Choose a random crossover point (excluding the first two points)
+        // Choose a random crossoverType point (excluding the first two points)
         int crossoverPoint = (int) (Math.random() * (length - 1)) + 1;
         // Create sets to keep track of unique points in child1 and child2
         // Copy the first part from parent1 to child1 and parent2 to child2
@@ -28,6 +28,7 @@ public class OnePointCrossoverMethod implements CrossoverMethod {
 
     private void insertSecondPart(Chromosome parent1, Chromosome parent2, Chromosome child1, int crossoverPoint, int length, Set<Point> uniquePointsChild1) {
         for (int c = crossoverPoint, p = crossoverPoint; c < length; c++, p++) {
+            p %= length;
             Point p2 = parent2.getPoint(p);
             if (!uniquePointsChild1.contains(p2)) {
                 child1.setPoint(c, p2);
@@ -35,10 +36,10 @@ public class OnePointCrossoverMethod implements CrossoverMethod {
                 continue;
             }
             Point p1 = parent1.getPoint(p);
-            if(!uniquePointsChild1.contains(p1)){
+            if (!uniquePointsChild1.contains(p1)) {
                 child1.setPoint(c, p1);
                 uniquePointsChild1.add(p1);
-            }else {
+            } else {
                 c--;
             }
         }

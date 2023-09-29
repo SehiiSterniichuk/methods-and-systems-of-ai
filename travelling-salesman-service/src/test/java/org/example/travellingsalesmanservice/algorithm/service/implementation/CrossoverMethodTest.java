@@ -53,7 +53,7 @@ class CrossoverMethodTest {
         CrossoverMethod crossoverMethod = new CycleCrossoverMethod(); // Replace with your actual implementation
         log.info("parent1: " + parent1);
         log.info("parent2: " + parent2);
-        // Perform crossover
+        // Perform crossoverType
         crossoverMethod.createTwoChildren(parent1, parent2, child1, child2);
         // Verify that the children have unique cities (no duplicates)
         log.info("child1: " + child1);
@@ -100,7 +100,7 @@ class CrossoverMethodTest {
         // Create a CrossoverMethod implementation
         log.info(parent1.toString());
         log.info(parent2.toString());
-        // Perform crossover
+        // Perform crossoverType
         crossoverMethod.createTwoChildren(parent1, parent2, child1, child2);
         // Verify that the children have unique cities (no duplicates)
         log.info(child1.toString());

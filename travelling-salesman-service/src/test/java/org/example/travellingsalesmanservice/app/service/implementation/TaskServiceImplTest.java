@@ -5,6 +5,7 @@ import org.example.travellingsalesmanservice.algorithm.domain.*;
 import org.example.travellingsalesmanservice.app.domain.ResultResponse;
 import org.example.travellingsalesmanservice.app.domain.TaskConfig;
 import org.example.travellingsalesmanservice.app.service.TaskService;
+import org.example.travellingsalesmanservice.data.repository.TaskRepository;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 class TaskServiceImplTest {
     private final TaskService service;
+    private final TaskRepository repository;
 
     private final SearcherConfig defaultSearcherConfig = SearcherConfig.builder()
             .breedingType(BreedingType.INBREEDING)
@@ -33,8 +35,9 @@ class TaskServiceImplTest {
             .build();
 
     @Autowired
-    TaskServiceImplTest(TaskService service) {
+    TaskServiceImplTest(TaskService service, TaskRepository repository) {
         this.service = service;
+        this.repository = repository;
     }
 
     @ParameterizedTest
@@ -42,6 +45,7 @@ class TaskServiceImplTest {
     void checkStart(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
                 .searcherConfig(defaultSearcherConfig)
                 .iterationNumber(3)
                 .mutationProbability(0.2f)
@@ -60,6 +64,23 @@ class TaskServiceImplTest {
     void getTaskSmallPopulation(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
+                .searcherConfig(defaultSearcherConfig)
+                .iterationNumber(limit * 2)
+                .mutationProbability((float) limit / 100)
+                .populationSize(limit * 10)
+                .showEachIterationStep(limit)
+                .allowedNumberOfGenerationsWithTheSameResult(limit * 2)
+                .build();
+        getTask(limit, config);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3, 4, 7, 10})
+    void getTaskSmallPopulationOnePointCrossover(int limit) {
+        TaskConfig config = TaskConfig
+                .builder()
+                .crossoverType(CrossoverType.ONE_POINT)
                 .searcherConfig(defaultSearcherConfig)
                 .iterationNumber(limit * 2)
                 .mutationProbability((float) limit / 100)
@@ -75,6 +96,7 @@ class TaskServiceImplTest {
     void getTaskSmallPopulationOppositeScenario(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
                 .searcherConfig(oppositeSearcherConfig)
                 .iterationNumber(limit * 2)
                 .mutationProbability((float) limit / 100)
@@ -90,6 +112,7 @@ class TaskServiceImplTest {
     void getTaskBigPopulation(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
                 .searcherConfig(defaultSearcherConfig)
                 .iterationNumber(limit * 40)
                 .mutationProbability((float) limit / 50)
@@ -105,6 +128,7 @@ class TaskServiceImplTest {
     void getTaskBigPopulationOppositeScenario(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
                 .searcherConfig(oppositeSearcherConfig)
                 .iterationNumber(limit * 40)
                 .mutationProbability((float) limit / 50)
@@ -134,5 +158,6 @@ class TaskServiceImplTest {
         log.info(response.toString());
         assertNotNull(response.result());
         assertEquals(p.length, Arrays.stream(response.result().path()).distinct().count());
+        repository.deleteById(id).block();
     }
 }

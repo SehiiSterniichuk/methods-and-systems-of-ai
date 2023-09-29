@@ -40,7 +40,6 @@ public class TaskServiceImpl implements TaskService {
         String id = taskService.createTask(config, dataset);
         log.info(STR. "new task with id: \{ id }" );
         map.put(id, new TrackingEntityWrapper(entity, future));
-        log.info("Submitted task with id: {}", id);
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {
@@ -53,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
     @SuppressWarnings("preview")
     public ResultResponse getTask(String id) {
         var entity = map.get(id);
-        log.info(STR. "get id: \{ id }" );
+        log.debug(STR. "get id: \{ id }" );
         if (entity == null) {
             throw new IllegalStateException(STR. "task with id: \{ id } not found" );
         }

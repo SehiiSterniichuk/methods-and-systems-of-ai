@@ -67,14 +67,18 @@ export enum BreedingType {
     INBREEDING = "INBREEDING",
     OUTBREEDING = "OUTBREEDING",
 }
-
+export enum CrossoverType {
+    CYCLIC = "CYCLIC",
+    ONE_POINT = "ONE_POINT",
+}
 export type TaskConfig = {
     iterationNumber: number;
     allowedNumberOfGenerationsWithTheSameResult: number;
     showEachIterationStep: number;
     populationSize: number;
     mutationProbability: number;
-    searcherConfig: SearcherConfig
+    searcherConfig: SearcherConfig;
+    crossoverType: CrossoverType;
 };
 export const defaultSearchConfig: SearcherConfig = {
     breedingType: BreedingType.INBREEDING,
@@ -87,7 +91,8 @@ export const defaultConfig: TaskConfig = {
     showEachIterationStep: 10,
     populationSize: 20,
     mutationProbability: 10,
-    searcherConfig: defaultSearchConfig
+    searcherConfig: defaultSearchConfig,
+    crossoverType: CrossoverType.CYCLIC
 }
 export type Statistic = {
     iteration: number;

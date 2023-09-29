@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class SimpleTravellingSalesmanSolverFactory {
     private final PathLengthEstimator estimator;
     private final XYPopulationGenerator generator;
-    private final CrossoverFactory crossoverFactory;
+    private final CrossoverAlgorithmFactory crossoverAlgorithmFactory;
 
     public TravellingSalesmanSolver getGeneticSolver(TaskConfig config, Dataset dataset, TrackingEntity entity) {
         if (GeneticAlgorithm.isSimple(dataset)) {
@@ -22,7 +22,7 @@ public class SimpleTravellingSalesmanSolverFactory {
                 .entity(entity)
                 .pathLengths(pathLengths)
                 .estimator(estimator)
-                .crossoverFactory(crossoverFactory)
+                .crossoverAlgorithmFactory(crossoverAlgorithmFactory)
                 .generator(generator)
                 .dataset(dataset)
                 .taskConfig(config)

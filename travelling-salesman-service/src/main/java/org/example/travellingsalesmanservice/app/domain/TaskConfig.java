@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.example.travellingsalesmanservice.algorithm.domain.CrossoverType;
 import org.example.travellingsalesmanservice.algorithm.domain.SearcherConfig;
 
 @Builder
@@ -20,5 +21,7 @@ public record TaskConfig(
         @Max(1)
         float mutationProbability,
         @NotNull
-        SearcherConfig searcherConfig) {
+        SearcherConfig searcherConfig,
+        @NotNull
+        CrossoverType crossoverType) {
 }

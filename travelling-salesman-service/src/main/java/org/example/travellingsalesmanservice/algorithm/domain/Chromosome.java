@@ -97,4 +97,10 @@ public record Chromosome(int[] x, int[] y) {
         x[i] = p2.x();
         y[i] = p2.y();
     }
+
+    @SuppressWarnings("unused")
+    public void fillWith(int i) {
+        Arrays.fill(x, i);
+        Arrays.fill(y, i);
+    }
 }

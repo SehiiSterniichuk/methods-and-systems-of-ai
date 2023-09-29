@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import "../styles/TaskConfiguration.scss";
-import {BreedingType, Distance, TaskConfig} from "../data/TaskData";
+import {BreedingType, CrossoverType, Distance, TaskConfig} from "../data/TaskData";
 
 interface Props {
     taskConfigId: number;
@@ -182,7 +182,6 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
                 return newConfig;
             });
         }
-
         return (
             <div className={"input-config selector-input"} id={`breeding_selector_${taskConfigId}`}>
                 <label className={"input-title"} htmlFor={`breedingType_${taskConfigId}`}>Breeding:</label>
@@ -190,6 +189,30 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
                         onChange={setBreedingType}>
                     <option value={BreedingType.INBREEDING}>Inbreeding</option>
                     <option value={BreedingType.OUTBREEDING}>Outbreeding</option>
+                </select>
+            </div>
+        );
+    }
+    function selectCrossoverType() {
+        function setCrossoverType(x: React.ChangeEvent<HTMLSelectElement>) {
+            if (x.currentTarget == null) return;
+            const value = x.currentTarget.value;
+            if (value == null || value.length < 1) {
+                return;
+            }
+            setConfig(c => {
+                const crossoverType:CrossoverType = CrossoverType.CYCLIC === value ? CrossoverType.CYCLIC : CrossoverType.ONE_POINT;
+                const newConfig: TaskConfig = {...c, crossoverType: crossoverType};
+                return newConfig;
+            });
+        }
+        return (
+            <div className={"input-config selector-input"} id={`crossover_selector_${taskConfigId}`}>
+                <label className={"input-title"} htmlFor={`crossoverType_${taskConfigId}`}>Crossover:</label>
+                <select id={`crossoverType_${taskConfigId}`} value={config.crossoverType}
+                        onChange={setCrossoverType}>
+                    <option value={CrossoverType.CYCLIC}>Cyclic</option>
+                    <option value={CrossoverType.ONE_POINT}>One point</option>
                 </select>
             </div>
         );
@@ -237,8 +260,11 @@ function TaskConfiguration({taskConfigId, setConfig, config, sendClicked}: Props
         <div className={"task-configuration"}>
             <div className="inputs">
                 {inputElements}
-                {selectDistanceType()}
-                {selectBreedingType()}
+                <div className="column-configs">
+                    {selectDistanceType()}
+                    {selectBreedingType()}
+                    {selectCrossoverType()}
+                </div>
             </div>
             {button}
         </div>
