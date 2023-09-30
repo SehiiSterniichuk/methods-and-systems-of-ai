@@ -3,6 +3,7 @@ package org.example.travellingsalesmanservice.algorithm.domain;
 import lombok.Builder;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 @Builder
 public record Result(Point[] path, double pathLength) {
@@ -14,15 +15,17 @@ public record Result(Point[] path, double pathLength) {
         return this.isBetterThan(r, 0.01);
     }
 
-//    private boolean isEqualLength(Result r, double eps) {
-//        return (this.pathLength - r.pathLength) < eps;
-//    }
-
     @Override
     public String toString() {
         return "Result{" +
                 "path=" + Arrays.toString(path) +
                 ", pathLength=" + pathLength +
                 '}';
+    }
+
+    public Chromosome toChromosome() {
+        Chromosome c = Chromosome.ofLength(path.length);
+        IntStream.range(0, path.length).forEach(i -> c.setPoint(i, path[i]));
+        return c;
     }
 }

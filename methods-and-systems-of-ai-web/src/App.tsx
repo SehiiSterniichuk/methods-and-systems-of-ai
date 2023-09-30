@@ -76,7 +76,7 @@ function App() {
     const studyArray64Configs_All = studyArray16Configs_All.map(t=>{
         return {...t, populationSize: 2048, showEachIterationStep: 100, allowedNumberOfGenerationsWithTheSameResult: 1000}
     })
-    const studyNow = studyArray64Configs_All;
+    const studyNow = [defaultConfig];
     const [taskData, setTaskData] = useState(studyNow.map(x => {
         const task: TaskData = {
             taskId: 0,

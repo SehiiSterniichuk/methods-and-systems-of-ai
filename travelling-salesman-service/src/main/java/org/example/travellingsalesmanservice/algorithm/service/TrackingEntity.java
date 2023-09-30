@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.algorithm.service;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.example.travellingsalesmanservice.algorithm.domain.Point;
 import org.example.travellingsalesmanservice.algorithm.domain.Result;
@@ -23,6 +24,9 @@ public class TrackingEntity {
     private final String timeUnitString = timeUnit.toString();
     @Getter
     private volatile boolean lastResultHasTaken = false;
+    @Getter
+    @Setter
+    private volatile boolean notifiedAboutEnd = false;
 
 
     public TrackingEntity(TaskConfig config, int datasetLength) {

@@ -103,4 +103,19 @@ public record Chromosome(int[] x, int[] y) {
         Arrays.fill(x, i);
         Arrays.fill(y, i);
     }
+
+    public void insertList(Iterable<Chromosome> bestList) {
+        int index = 0;
+        for (Chromosome c : bestList) {
+            for (int j = 0; j < c.size(); j++) {
+                this.setFrom(index, j, c);
+                index++;
+            }
+        }
+    }
+
+    private void setFrom(int target, int source, Chromosome parent) {
+        x[target] = parent.x[source];
+        y[target] = parent.y[source];
+    }
 }

@@ -55,8 +55,12 @@ public class TaskServiceImpl implements TaskService {
         log.debug(STR. "get id: \{ id }" );
         if (entity == null) {
             throw new IllegalStateException(STR. "task with id: \{ id } not found" );
-        } else if (entity.e.isLastResultHasTaken()) {
+        } else if (entity.e.isLastResultHasTaken() && !entity.e.isNotifiedAboutEnd()) {
+            entity.e.setNotifiedAboutEnd(true);
             throw new IllegalStateException(STR. "task with id: \{ id } has received its last result" );
+        }
+        if (entity.e.isNotifiedAboutEnd()) {
+            return null;
         }
         ResultResponse resultResponse = entity.e.get();
         log.debug(STR. "get resultresponse id: \{ id }" );

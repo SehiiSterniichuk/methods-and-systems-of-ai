@@ -10,6 +10,9 @@ import org.example.travellingsalesmanservice.algorithm.domain.Result;
 import org.example.travellingsalesmanservice.algorithm.service.*;
 import org.example.travellingsalesmanservice.app.domain.TaskConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.example.travellingsalesmanservice.app.domain.ResultResponse.*;
 
 @RequiredArgsConstructor
@@ -48,12 +51,47 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
         return dataset.data().length < 4;
     }
 
+    static class SavedPopulation {
+        private final List<Chromosome> list;
+        private int bestP = -1;
+        public final int limit;
+
+        public SavedPopulation(int limit) {
+            this.limit = limit;
+            this.list = new ArrayList<>(limit + 1);
+        }
+
+        public void add(Chromosome chromosome) {
+            bestP = (bestP + 1) % limit;
+            if (list.size() < limit) {
+                list.add(chromosome);
+            } else {
+                list.set(bestP, chromosome);
+            }
+        }
+
+        public void setCurrent(Chromosome chromosome){
+            if (list.size() < (limit + 1)) {
+                list.add(chromosome);
+            } else {
+                list.set(limit, chromosome);
+            }
+        }
+
+        public void copyTo(Chromosome chromosomes) {
+            chromosomes.insertList(list);
+        }
+    }
+
     protected void start(Chromosome chromosomes, CrossoverAlgorithm crossover) {
         int counterOfSameResults = 0;//лічильник не кращих результатів
         Result bestResult = findBestPath(chromosomes, pathLengths);//шукаємо початковий найкоротший шлях
         int i = 0;
+        SavedPopulation saved = initSaved();
+        saved.add(bestResult.toChromosome());
         for (; i < taskConfig.iterationNumber(); i++) {//поки не закінчилися ітерації продовжуємо цикл
             //проводимо кросовер
+            saved.copyTo(chromosomes);
             crossover.performCrossover(chromosomes, pathLengths, taskConfig.mutationProbability());
             //оцінка популяції
             estimator.calculateSquaredPathLength(chromosomes, pathLengths);
@@ -61,11 +99,13 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
             var current = findBestPath(chromosomes, pathLengths);
             if (current.isBetterThan(bestResult)) {//якщо поточний кращий за останній найкращий
                 bestResult = current;//зберігаємо поточний як найкращий
+                saved.add(bestResult.toChromosome());
                 counterOfSameResults = 0;//обнуляємо лічильник однакового результату
                 entity.put(getNewBestResult(bestResult, i));//кладемо результат у чергу як найкращий щоб повідомити користувача
             } else if (counterOfSameResults < taskConfig.allowedNumberOfGenerationsWithTheSameResult()) {
                 //якщо результат не краще і ми ще не досягнули ліміту повторень одного й того ж результату
                 counterOfSameResults++;//інкрементуємо лічильник
+                saved.setCurrent(current.toChromosome());
             } else {//якщо ми не знайшли новий кращий результат і вже досягнули ліміту
                 entity.put(getResultCounter(bestResult, i, counterOfSameResults));//кладемо у чергу поточний результат
                 break;//перериваємо цикл
@@ -78,6 +118,10 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
                 entity.put(getFinishResult(bestResult, i));// якщо це остання ітерація, сповіщаємо користувача про це
             }
         }
+    }
+
+    private SavedPopulation initSaved() {
+        return new SavedPopulation(pathLengths.length / 2);
     }
 
     private void handleSimpleTask() {
@@ -117,6 +161,8 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
         for (int i = 0; i < numberOfCities; i++, index++) {
             bestPath[i] = new Point(chromosomes.x()[index], chromosomes.y()[index]);
         }
+        Chromosome best = Chromosome.ofLength(numberOfCities);
+        best.fillWith(0, chromosomes, minIndex * numberOfCities, numberOfCities);
         return new Result(bestPath, Math.sqrt(min));
     }
 }
