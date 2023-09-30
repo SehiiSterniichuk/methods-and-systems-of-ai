@@ -18,7 +18,7 @@ class CycleCrossoverMethod implements CrossoverMethod {
         int y;
     }
 
-    @Override
+    @Override//проводимо циклічний кросовер
     public void createTwoChildren(Chromosome parent1, Chromosome parent2, Chromosome child1, Chromosome child2) {
         int length = parent1.x().length;
         int startA = IntStream.range(1, parent1.size())

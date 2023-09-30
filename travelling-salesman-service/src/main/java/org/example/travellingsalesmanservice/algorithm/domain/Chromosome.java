@@ -1,6 +1,7 @@
 package org.example.travellingsalesmanservice.algorithm.domain;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public record Chromosome(int[] x, int[] y) {
@@ -11,6 +12,10 @@ public record Chromosome(int[] x, int[] y) {
     public void fillWith(int start, Chromosome source, int sourceStart, int length) {
         System.arraycopy(source.x, sourceStart, x, start, length);
         System.arraycopy(source.y, sourceStart, y, start, length);
+    }
+
+    public Point getPoint(int i) {
+        return new Point(x[i], y[i]);
     }
 
     public int size() {
@@ -39,6 +44,30 @@ public record Chromosome(int[] x, int[] y) {
                 '}';
     }
 
+    @SuppressWarnings("preview")
+    public String toString(int N, int chromosomeLength) {
+        assert N <= x.length;
+        return STR. """
+                Chromosome [\{ N } elements] {
+                x={\{ collectWholeChromosome(x, N, chromosomeLength) }}
+                y={\{ collectWholeChromosome(y, N, chromosomeLength) }}
+                }
+                """ ;
+    }
+
+    private String collectWholeChromosome(int[] array, int N, int chromosomeLength) {
+        return IntStream.range(0, N / chromosomeLength)
+                .mapToObj(i -> toStringChromosome(array, chromosomeLength * i, chromosomeLength))
+                .collect(Collectors.joining(","));
+    }
+
+    private String toStringChromosome(int[] array, int start, int length) {
+        String collected = IntStream.range(start, start + length)
+                .mapToObj(i -> array[i] + "")
+                .collect(Collectors.joining(","));
+        return STR. "[\{ collected }]" ;
+    }
+
     public void setFrom(int i, Chromosome parent) {
         x[i] = parent.x[i];
         y[i] = parent.y[i];
@@ -62,5 +91,16 @@ public record Chromosome(int[] x, int[] y) {
             }
         }
         return true;
+    }
+
+    public void setPoint(int i, Point p2) {
+        x[i] = p2.x();
+        y[i] = p2.y();
+    }
+
+    @SuppressWarnings("unused")
+    public void fillWith(int i) {
+        Arrays.fill(x, i);
+        Arrays.fill(y, i);
     }
 }

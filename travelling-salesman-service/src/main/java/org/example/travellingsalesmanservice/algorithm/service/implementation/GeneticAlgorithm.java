@@ -1,83 +1,94 @@
 package org.example.travellingsalesmanservice.algorithm.service.implementation;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.travellingsalesmanservice.algorithm.domain.*;
-import org.example.travellingsalesmanservice.algorithm.service.PathLengthEstimator;
-import org.example.travellingsalesmanservice.algorithm.service.TrackingEntity;
-import org.example.travellingsalesmanservice.algorithm.service.TravellingSalesmanSolver;
-import org.example.travellingsalesmanservice.algorithm.service.XYPopulationGenerator;
+import org.example.travellingsalesmanservice.algorithm.domain.Chromosome;
+import org.example.travellingsalesmanservice.algorithm.domain.Dataset;
+import org.example.travellingsalesmanservice.algorithm.domain.Point;
+import org.example.travellingsalesmanservice.algorithm.domain.Result;
+import org.example.travellingsalesmanservice.algorithm.service.*;
 import org.example.travellingsalesmanservice.app.domain.TaskConfig;
-import org.springframework.stereotype.Component;
 
-import static java.lang.StringTemplate.STR;
+import static org.example.travellingsalesmanservice.app.domain.ResultResponse.*;
 
 @RequiredArgsConstructor
-@Component
 @Slf4j
-class GeneticAlgorithm implements TravellingSalesmanSolver {
+@Builder
+class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відповідальний за роботу алгоритму
     private final PathLengthEstimator estimator;
     private final XYPopulationGenerator generator;
+    private final CrossoverAlgorithmFactory crossoverAlgorithmFactory;
+    private final TrackingEntity entity;
+    private final int[] pathLengths;
+    private final Dataset dataset;
+    private final TaskConfig taskConfig;
 
     @Override
-    public TrackingEntity start(Dataset dataset, AlgorithmConfiguration configuration) {
-        if (dataset.data().length < 4) {
-            handleSimpleTask(dataset, configuration);
-            return configuration.trackingEntity();
+    public TrackingEntity start() {//старт алгоритму
+        if (isSimple(dataset)) {//перевіряємо чи датасет більше 3 точок
+            handleSimpleTask();
+            return entity;
         }
-        var taskConfig = configuration.taskConfig();
-        var entity = configuration.trackingEntity();
+        //генеруємо початкову популяцію
         var chromosomes = generator.generateChromosomes(dataset, taskConfig.populationSize());
-        var pathLengths = new int[taskConfig.populationSize()];
+        //оцінюємо початкову популяцію
         estimator.calculateSquaredPathLength(chromosomes, pathLengths);
         try {
-            start(configuration, chromosomes, pathLengths, taskConfig, entity);
+            //переходимо до циклу
+            start(chromosomes, crossoverAlgorithmFactory.getCrossover(taskConfig, pathLengths, chromosomes));
         } catch (RuntimeException e) {
-            entity.putFinish(null, -1, e.getMessage());
+            entity.put(getErrorResult(e.getMessage(), -1));
             throw e;
         }
         return entity;
     }
 
-    private void start(AlgorithmConfiguration configuration, Chromosome chromosomes,
-                       int[] pathLengths, TaskConfig taskConfig, TrackingEntity entity) {
-        int counterOfSameResults = 0;
-        Result bestResult = findBestPath(chromosomes, pathLengths);
+    public static boolean isSimple(Dataset dataset) {
+        return dataset.data().length < 4;
+    }
+
+    protected void start(Chromosome chromosomes, CrossoverAlgorithm crossover) {
+        int counterOfSameResults = 0;//лічильник не кращих результатів
+        Result bestResult = findBestPath(chromosomes, pathLengths);//шукаємо початковий найкоротший шлях
         int i = 0;
-        for (; i < taskConfig.iterationNumber(); i++) {
-            configuration.crossoverAlgorithm().crossover(chromosomes, pathLengths, configuration.searcher(),
-                    configuration.taskConfig().mutationProbability());
+        for (; i < taskConfig.iterationNumber(); i++) {//поки не закінчилися ітерації продовжуємо цикл
+            //проводимо кросовер
+            crossover.performCrossover(chromosomes, pathLengths, taskConfig.mutationProbability());
+            //оцінка популяції
             estimator.calculateSquaredPathLength(chromosomes, pathLengths);
-            var currentResult = findBestPath(chromosomes, pathLengths);
-            if (currentResult.isBetterThan(bestResult)) {
-                bestResult = currentResult;
-                counterOfSameResults = 0;
-                entity.put(bestResult, i, "New best result");
+            //знаходимо найкращого в поточній популяції
+            var current = findBestPath(chromosomes, pathLengths);
+            if (current.isBetterThan(bestResult)) {//якщо поточний кращий за останній найкращий
+                bestResult = current;//зберігаємо поточний як найкращий
+                counterOfSameResults = 0;//обнуляємо лічильник однакового результату
+                entity.put(getNewBestResult(bestResult, i));//кладемо результат у чергу як найкращий щоб повідомити користувача
             } else if (counterOfSameResults < taskConfig.allowedNumberOfGenerationsWithTheSameResult()) {
-                counterOfSameResults++;
-            } else {
-                entity.putFinish(bestResult, i, STR."Finished. Counter of the same result: \{counterOfSameResults}");
-                break;
+                //якщо результат не краще і ми ще не досягнули ліміту повторень одного й того ж результату
+                counterOfSameResults++;//інкрементуємо лічильник
+            } else {//якщо ми не знайшли новий кращий результат і вже досягнули ліміту
+                entity.put(getResultCounter(bestResult, i, counterOfSameResults));//кладемо у чергу поточний результат
+                break;//перериваємо цикл
             }
             boolean show = i % taskConfig.showEachIterationStep() == 0;
             boolean finish = i + 1 == taskConfig.iterationNumber();
-            if (show && !finish) {
-                entity.put(bestResult, i, "Show iteration");
+            if (show && !finish) {// якщо це не остання ітерація, але треба повідомити користувача
+                entity.put(getShowResult(bestResult, i));//сповіщаємо користувача про поточний номер ітерації
             } else if (finish) {
-                entity.putFinish(bestResult, i, STR."Finished all iterations.");
+                entity.put(getFinishResult(bestResult, i));// якщо це остання ітерація, сповіщаємо користувача про це
             }
         }
     }
 
-    private void handleSimpleTask(Dataset dataset, AlgorithmConfiguration configuration) {
+    private void handleSimpleTask() {
         Result result = Result.builder()
                 .path(dataset.data())
                 .pathLength(calculatePath(dataset.data()))
                 .build();
-        configuration.trackingEntity().putFinish(result, 0);
+        entity.put(getFinishResult(result, 0));
     }
 
-    private double calculatePath(Point[] data) {
+    private double calculatePath(Point[] data) {//калькулятор простих кейсів датасету
         if (data.length <= 1) {
             return 0;
         } else if (data.length == 2) {
@@ -89,6 +100,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
         }
     }
 
+    //шукаємо найкращий результат у поточному датасеті
     private Result findBestPath(Chromosome chromosomes, int[] pathLengths) {
         int numberOfCities = (chromosomes.x().length - 1) / pathLengths.length;
         int min = pathLengths[0];

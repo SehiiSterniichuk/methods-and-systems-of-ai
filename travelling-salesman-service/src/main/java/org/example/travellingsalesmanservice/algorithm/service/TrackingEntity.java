@@ -1,5 +1,6 @@
 package org.example.travellingsalesmanservice.algorithm.service;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.example.travellingsalesmanservice.algorithm.domain.Point;
 import org.example.travellingsalesmanservice.algorithm.domain.Result;
@@ -20,6 +21,8 @@ public class TrackingEntity {
     private final TimeUnit timeUnit = TimeUnit.MILLISECONDS;
     @SuppressWarnings("unused")
     private final String timeUnitString = timeUnit.toString();
+    @Getter
+    private volatile boolean lastResultHasTaken = false;
 
 
     public TrackingEntity(TaskConfig config, int datasetLength) {
@@ -30,35 +33,17 @@ public class TrackingEntity {
     }
 
     @SneakyThrows
-    public void put(Result result, int currentIteration, String message) {
-        put(result, currentIteration, message, true);
-    }
-
-    @SneakyThrows
-    public void putFinish(Result result, int currentIteration) {
-        putFinish(result, currentIteration, null);
-    }
-
-    @SneakyThrows
-    public void putFinish(Result result, int currentIteration, String message) {
-        put(result, currentIteration, message, false);
-    }
-
-    @SneakyThrows
-    public void put(Result result, int currentIteration, String message, boolean hasNext) {
-        var r = ResultResponse.builder()
-                .result(result)
-                .currentIteration(currentIteration)
-                .message(message)
-                .hasNext(hasNext)
-                .build();
-        queue.put(r);
+    public void put(ResultResponse result) {
+        queue.put(result);
     }
 
 
     @SneakyThrows
     public ResultResponse get() {
         ResultResponse poll = queue.poll(timeout, timeUnit);
+        if (poll != null && !poll.hasNext()) {
+            lastResultHasTaken = true;
+        }
         return poll != null ? poll : getTimeoutResponse();
     }
 
@@ -66,10 +51,9 @@ public class TrackingEntity {
     private ResultResponse getTimeoutResponse() {
         return ResultResponse.builder()
                 .result(timeoutResult)
-                .message(STR."TIMEOUT: \{this.timeout} of \{timeUnitString}")
+                .message(STR. "TIMEOUT: \{ this.timeout } of \{ timeUnitString }" )
                 .currentIteration(-1)
                 .hasNext(false)
                 .build();
     }
-
 }

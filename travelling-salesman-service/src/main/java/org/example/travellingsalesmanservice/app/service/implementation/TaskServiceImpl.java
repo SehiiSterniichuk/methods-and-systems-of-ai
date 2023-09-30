@@ -2,22 +2,19 @@ package org.example.travellingsalesmanservice.app.service.implementation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.travellingsalesmanservice.algorithm.domain.AlgorithmConfiguration;
 import org.example.travellingsalesmanservice.algorithm.domain.Dataset;
 import org.example.travellingsalesmanservice.algorithm.domain.TaskId;
-import org.example.travellingsalesmanservice.algorithm.service.CrossoverAlgorithm;
-import org.example.travellingsalesmanservice.algorithm.service.SecondParentSearcher;
-import org.example.travellingsalesmanservice.algorithm.service.TrackingEntity;
-import org.example.travellingsalesmanservice.algorithm.service.TravellingSalesmanSolver;
+import org.example.travellingsalesmanservice.algorithm.service.*;
+import org.example.travellingsalesmanservice.algorithm.service.implementation.SimpleTravellingSalesmanSolverFactory;
 import org.example.travellingsalesmanservice.app.domain.ResultResponse;
 import org.example.travellingsalesmanservice.app.domain.TaskConfig;
 import org.example.travellingsalesmanservice.app.service.TaskService;
+import org.example.travellingsalesmanservice.data.service.TaskStorageService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.StringTemplate.STR;
 
@@ -28,11 +25,9 @@ import static java.lang.StringTemplate.STR;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskExecutor executor;
-    private final CrossoverAlgorithm crossoverAlgorithm;
-    private final SecondParentSearcher searcher;
-    private final TravellingSalesmanSolver solver;
-    private final Map<Long, TrackingEntityWrapper> map = new ConcurrentHashMap<>();
-    private final AtomicLong counter = new AtomicLong(0);
+    private final TaskStorageService taskService;
+    private final Map<String, TrackingEntityWrapper> map = new ConcurrentHashMap<>();
+    private final SimpleTravellingSalesmanSolverFactory factory;
 
     record TrackingEntityWrapper(TrackingEntity e, Future<TrackingEntity> f) {
     }
@@ -40,35 +35,76 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskId createTask(TaskConfig config, Dataset dataset) {
         var entity = new TrackingEntity(config, dataset.data().length);
-        var algoConfig = new AlgorithmConfiguration(config, entity, crossoverAlgorithm, searcher);
-        var future = executor.submit(() -> solver.start(dataset, algoConfig));
-        long id = counter.incrementAndGet();
+        TravellingSalesmanSolver solver = factory.getGeneticSolver(config, dataset, entity);
+        var future = executor.submit(solver::start);
+        String id = taskService.createTask(config, dataset);
+        log.info(STR. "new task with id: \{ id }" );
         map.put(id, new TrackingEntityWrapper(entity, future));
-        log.info("Submitted task with id: {}", id);
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return new TaskId(id);
     }
 
     @Override
     @SuppressWarnings("preview")
-    public ResultResponse getTask(Long id) {
+    public ResultResponse getTask(String id) {
         var entity = map.get(id);
+        log.debug(STR. "get id: \{ id }" );
         if (entity == null) {
-            throw new IllegalStateException(STR."task with id: \{id} not found");
+            throw new IllegalStateException(STR. "task with id: \{ id } not found" );
+        } else if (entity.e.isLastResultHasTaken()) {
+            throw new IllegalStateException(STR. "task with id: \{ id } has received its last result" );
         }
         ResultResponse resultResponse = entity.e.get();
-        if (!resultResponse.isHasNext()) {
-            map.remove(id);
-            if (!entity.f.isDone()) {
-                entity.f.cancel(true);
-            }
+        log.debug(STR. "get resultresponse id: \{ id }" );
+        if (!resultResponse.hasNext()) {
+            lastResult(id, entity);
         }
         if (entity.f.state() == Future.State.FAILED) {
-            var throwable = entity.f.exceptionNow();
-            log.error(throwable.getMessage());
-            resultResponse = resultResponse.toBuilder()
-                    .message(resultResponse.getMessage() + " " + throwable.getMessage())
-                    .build();
+            resultResponse = failedTask(id, entity, resultResponse);
+        }
+        if (resultResponse.isNewBestResult()) {
+            taskService.updateTask(id, resultResponse);
         }
         return resultResponse;
+    }
+
+    private ResultResponse failedTask(String id, TrackingEntityWrapper entity, ResultResponse resultResponse) {
+        var throwable = entity.f.exceptionNow();
+        String message = throwable.getMessage();
+        log.error(message);
+        resultResponse = resultResponse.toBuilder()
+                .message(resultResponse.message() + " " + message)
+                .build();
+        taskService.addMessage(id, message);
+        removeAfterTime(id);
+        return resultResponse;
+    }
+
+    private void lastResult(String id, TrackingEntityWrapper entity) {
+        String message;
+        if (!entity.f.isDone()) {
+            entity.f.cancel(true);
+            message = STR. "task with id: \{ id } was canceled" ;
+        } else {
+            message = STR. "Task with id: \{ id } is finished" ;
+        }
+        log.info(message);
+        taskService.addMessage(id, message);
+    }
+
+    //todo try to delete this:)
+    private void removeAfterTime(String id) {
+        executor.execute(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            map.remove(id);
+        });
     }
 }

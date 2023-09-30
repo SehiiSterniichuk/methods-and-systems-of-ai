@@ -1,4 +1,4 @@
 package org.example.travellingsalesmanservice.algorithm.domain;
 
-public record TaskId(long id) {
+public record TaskId(String id) {
 }

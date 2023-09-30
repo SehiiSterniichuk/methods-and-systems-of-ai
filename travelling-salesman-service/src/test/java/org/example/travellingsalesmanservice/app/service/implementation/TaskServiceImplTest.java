@@ -1,12 +1,11 @@
 package org.example.travellingsalesmanservice.app.service.implementation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.travellingsalesmanservice.algorithm.domain.Dataset;
-import org.example.travellingsalesmanservice.algorithm.domain.Point;
-import org.example.travellingsalesmanservice.algorithm.domain.TaskId;
+import org.example.travellingsalesmanservice.algorithm.domain.*;
 import org.example.travellingsalesmanservice.app.domain.ResultResponse;
 import org.example.travellingsalesmanservice.app.domain.TaskConfig;
 import org.example.travellingsalesmanservice.app.service.TaskService;
+import org.example.travellingsalesmanservice.data.repository.TaskRepository;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,23 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 class TaskServiceImplTest {
     private final TaskService service;
+    private final TaskRepository repository;
+
+    private final SearcherConfig defaultSearcherConfig = SearcherConfig.builder()
+            .breedingType(BreedingType.INBREEDING)
+            .diffPercent(33)
+            .distance(Distance.SCALAR)
+            .build();
+    private final SearcherConfig oppositeSearcherConfig = SearcherConfig.builder()
+            .breedingType(BreedingType.OUTBREEDING)
+            .diffPercent(33)
+            .distance(Distance.HAMMING)
+            .build();
 
     @Autowired
-    TaskServiceImplTest(TaskService service) {
+    TaskServiceImplTest(TaskService service, TaskRepository repository) {
         this.service = service;
+        this.repository = repository;
     }
 
     @ParameterizedTest
@@ -33,6 +45,8 @@ class TaskServiceImplTest {
     void checkStart(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
+                .searcherConfig(defaultSearcherConfig)
                 .iterationNumber(3)
                 .mutationProbability(0.2f)
                 .populationSize(30)
@@ -41,8 +55,8 @@ class TaskServiceImplTest {
                 .build();
         Point[] p = Stream.generate(() -> Point.getRandom(1000)).distinct().limit(limit).toArray(Point[]::new);
         TaskId task = service.createTask(config, new Dataset(p));
-        long id = task.id();
-        assertTrue(id > 0);
+        var id = task.id();
+        assertFalse(id.isBlank());
     }
 
     @ParameterizedTest
@@ -50,6 +64,8 @@ class TaskServiceImplTest {
     void getTaskSmallPopulation(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
+                .searcherConfig(defaultSearcherConfig)
                 .iterationNumber(limit * 2)
                 .mutationProbability((float) limit / 100)
                 .populationSize(limit * 10)
@@ -60,10 +76,60 @@ class TaskServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {10, 15, 20, 30})
+    @ValueSource(ints = {0, 1, 2, 3, 4, 7, 10})
+    void getTaskSmallPopulationOnePointCrossover(int limit) {
+        TaskConfig config = TaskConfig
+                .builder()
+                .crossoverType(CrossoverType.ONE_POINT)
+                .searcherConfig(defaultSearcherConfig)
+                .iterationNumber(limit * 2)
+                .mutationProbability((float) limit / 100)
+                .populationSize(limit * 10)
+                .showEachIterationStep(limit)
+                .allowedNumberOfGenerationsWithTheSameResult(limit * 2)
+                .build();
+        getTask(limit, config);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3, 4, 7, 10})
+    void getTaskSmallPopulationOppositeScenario(int limit) {
+        TaskConfig config = TaskConfig
+                .builder()
+                .crossoverType(CrossoverType.CYCLIC)
+                .searcherConfig(oppositeSearcherConfig)
+                .iterationNumber(limit * 2)
+                .mutationProbability((float) limit / 100)
+                .populationSize(limit * 10)
+                .showEachIterationStep(limit)
+                .allowedNumberOfGenerationsWithTheSameResult(limit * 2)
+                .build();
+        getTask(limit, config);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {10, 15, 20})
     void getTaskBigPopulation(int limit) {
         TaskConfig config = TaskConfig
                 .builder()
+                .crossoverType(CrossoverType.CYCLIC)
+                .searcherConfig(defaultSearcherConfig)
+                .iterationNumber(limit * 40)
+                .mutationProbability((float) limit / 50)
+                .populationSize(limit * 1000)
+                .showEachIterationStep(10)
+                .allowedNumberOfGenerationsWithTheSameResult(limit * 2)
+                .build();
+        getTask(limit, config);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {10, 15, 20})
+    void getTaskBigPopulationOppositeScenario(int limit) {
+        TaskConfig config = TaskConfig
+                .builder()
+                .crossoverType(CrossoverType.CYCLIC)
+                .searcherConfig(oppositeSearcherConfig)
                 .iterationNumber(limit * 40)
                 .mutationProbability((float) limit / 50)
                 .populationSize(limit * 1000)
@@ -78,19 +144,20 @@ class TaskServiceImplTest {
         Point[] p = Stream.generate(() -> Point.getRandom(1000)).distinct().limit(limit).toArray(Point[]::new);
         TaskId task = service.createTask(config, new Dataset(p));
         log.info("input: "  + Arrays.toString(p));
-        long id = task.id();
-        assertTrue(id > 0);
+        var id = task.id();
+        assertFalse(id.isBlank());
         ResultResponse response = service.getTask(id);
         assertNotNull(response);
         log.info(response.toString());
-        while (response.isHasNext()) {
+        while (response.hasNext()) {
             response = service.getTask(id);
             assertNotNull(response);
             log.info(response.toString());
-            assertEquals(p.length, Arrays.stream(response.getResult().path()).distinct().count());
+            assertEquals(p.length, Arrays.stream(response.result().path()).distinct().count());
         }
         log.info(response.toString());
-        assertNotNull(response.getResult());
-        assertEquals(p.length, Arrays.stream(response.getResult().path()).distinct().count());
+        assertNotNull(response.result());
+        assertEquals(p.length, Arrays.stream(response.result().path()).distinct().count());
+        repository.deleteById(id).block();
     }
 }

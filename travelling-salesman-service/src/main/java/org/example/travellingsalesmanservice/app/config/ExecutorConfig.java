@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 public class ExecutorConfig {
     @Bean
     public TaskExecutor taskExecutor() {
-        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-        return new TaskExecutor(singleThreadExecutor);
+        ExecutorService service = Executors.newVirtualThreadPerTaskExecutor();
+        return new TaskExecutor(service);
     }
 }
