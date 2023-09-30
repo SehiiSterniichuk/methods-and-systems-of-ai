@@ -10,14 +10,14 @@ import java.util.Set;
 
 @Component
 public class OnePointCrossoverMethod implements CrossoverMethod {
-    @Override
+    @Override//одноточковий кросовер
     public void createTwoChildren(Chromosome parent1, Chromosome parent2, Chromosome child1, Chromosome child2) {
         int length = parent1.size();
+        // Create sets to keep track of unique points in child1 and child2
         Set<Point> uniquePointsChild1 = new HashSet<>(length);
         Set<Point> uniquePointsChild2 = new HashSet<>(length);
         // Choose a random crossoverType point (excluding the first two points)
         int crossoverPoint = (int) (Math.random() * (length - 1)) + 1;
-        // Create sets to keep track of unique points in child1 and child2
         // Copy the first part from parent1 to child1 and parent2 to child2
         copyFirstPart(parent1, child1, crossoverPoint, uniquePointsChild1);
         copyFirstPart(parent2, child2, crossoverPoint, uniquePointsChild2);

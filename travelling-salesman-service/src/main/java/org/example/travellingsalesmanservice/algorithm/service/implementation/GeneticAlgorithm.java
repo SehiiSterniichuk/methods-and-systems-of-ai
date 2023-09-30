@@ -15,7 +15,7 @@ import static org.example.travellingsalesmanservice.app.domain.ResultResponse.*;
 @RequiredArgsConstructor
 @Slf4j
 @Builder
-class GeneticAlgorithm implements TravellingSalesmanSolver {
+class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відповідальний за роботу алгоритму
     private final PathLengthEstimator estimator;
     private final XYPopulationGenerator generator;
     private final CrossoverAlgorithmFactory crossoverAlgorithmFactory;
@@ -25,14 +25,17 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
     private final TaskConfig taskConfig;
 
     @Override
-    public TrackingEntity start() {
-        if (isSimple(dataset)) {
+    public TrackingEntity start() {//старт алгоритму
+        if (isSimple(dataset)) {//перевіряємо чи датасет більше 3 точок
             handleSimpleTask();
             return entity;
         }
+        //генеруємо початкову популяцію
         var chromosomes = generator.generateChromosomes(dataset, taskConfig.populationSize());
+        //оцінюємо початкову популяцію
         estimator.calculateSquaredPathLength(chromosomes, pathLengths);
         try {
+            //переходимо до циклу
             start(chromosomes, crossoverAlgorithmFactory.getCrossover(taskConfig, pathLengths, chromosomes));
         } catch (RuntimeException e) {
             entity.put(getErrorResult(e.getMessage(), -1));
@@ -41,38 +44,38 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
         return entity;
     }
 
-
-
     public static boolean isSimple(Dataset dataset) {
         return dataset.data().length < 4;
     }
 
     protected void start(Chromosome chromosomes, CrossoverAlgorithm crossover) {
-        int counterOfSameResults = 0;
-        Result bestResult = findBestPath(chromosomes, pathLengths);
+        int counterOfSameResults = 0;//лічильник не кращих результатів
+        Result bestResult = findBestPath(chromosomes, pathLengths);//шукаємо початковий найкоротший шлях
         int i = 0;
-        for (; i < taskConfig.iterationNumber(); i++) {
+        for (; i < taskConfig.iterationNumber(); i++) {//поки не закінчилися ітерації продовжуємо цикл
+            //проводимо кросовер
             crossover.performCrossover(chromosomes, pathLengths, taskConfig.mutationProbability());
+            //оцінка популяції
             estimator.calculateSquaredPathLength(chromosomes, pathLengths);
+            //знаходимо найкращого в поточній популяції
             var current = findBestPath(chromosomes, pathLengths);
-            if (current.isBetterThan(bestResult)) {
-                bestResult = current;
-                counterOfSameResults = 0;
-                entity.put(getNewBestResult(bestResult, i));
+            if (current.isBetterThan(bestResult)) {//якщо поточний кращий за останній найкращий
+                bestResult = current;//зберігаємо поточний як найкращий
+                counterOfSameResults = 0;//обнуляємо лічильник однакового результату
+                entity.put(getNewBestResult(bestResult, i));//кладемо результат у чергу як найкращий щоб повідомити користувача
             } else if (counterOfSameResults < taskConfig.allowedNumberOfGenerationsWithTheSameResult()) {
-                counterOfSameResults++;
-            } else {
-                entity.put(getResultCounter(bestResult, i, counterOfSameResults));
-                break;
+                //якщо результат не краще і ми ще не досягнули ліміту повторень одного й того ж результату
+                counterOfSameResults++;//інкрементуємо лічильник
+            } else {//якщо ми не знайшли новий кращий результат і вже досягнули ліміту
+                entity.put(getResultCounter(bestResult, i, counterOfSameResults));//кладемо у чергу поточний результат
+                break;//перериваємо цикл
             }
             boolean show = i % taskConfig.showEachIterationStep() == 0;
             boolean finish = i + 1 == taskConfig.iterationNumber();
-            if (show && !finish) {
-                String chromosomesString = chromosomes.toString(0, chromosomes.size() / pathLengths.length);
-                log.debug(chromosomesString);
-                entity.put(getShowResult(bestResult, i));
+            if (show && !finish) {// якщо це не остання ітерація, але треба повідомити користувача
+                entity.put(getShowResult(bestResult, i));//сповіщаємо користувача про поточний номер ітерації
             } else if (finish) {
-                entity.put(getFinishResult(bestResult, i));
+                entity.put(getFinishResult(bestResult, i));// якщо це остання ітерація, сповіщаємо користувача про це
             }
         }
     }
@@ -85,7 +88,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
         entity.put(getFinishResult(result, 0));
     }
 
-    private double calculatePath(Point[] data) {
+    private double calculatePath(Point[] data) {//калькулятор простих кейсів датасету
         if (data.length <= 1) {
             return 0;
         } else if (data.length == 2) {
@@ -97,6 +100,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {
         }
     }
 
+    //шукаємо найкращий результат у поточному датасеті
     private Result findBestPath(Chromosome chromosomes, int[] pathLengths) {
         int numberOfCities = (chromosomes.x().length - 1) / pathLengths.length;
         int min = pathLengths[0];

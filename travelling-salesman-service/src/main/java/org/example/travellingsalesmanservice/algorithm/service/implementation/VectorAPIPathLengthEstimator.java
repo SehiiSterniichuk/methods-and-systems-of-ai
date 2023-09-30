@@ -8,30 +8,31 @@ import org.example.travellingsalesmanservice.algorithm.service.PathLengthEstimat
 import org.springframework.stereotype.Component;
 
 @Component
-public class VectorAPIPathLengthEstimator implements PathLengthEstimator {
+public class VectorAPIPathLengthEstimator implements PathLengthEstimator {//клас обрахунку довжин шляхів популяції
     public static final VectorSpecies<Integer> species = IntVector.SPECIES_PREFERRED;
 
     @Override
-    public void calculateSquaredPathLength(Chromosome chromosomes, int[] pathLengths) {
+    public void calculateSquaredPathLength(Chromosome chromosomes, int[] pathLengths) {//передаємо хромосому та буфер для запису довжин шляхів
         calculateSquaredPathLength(chromosomes.x(), chromosomes.y(), pathLengths);
     }
 
     private void calculateSquaredPathLength(int[] xData, int[] yData, int[] pathLengths) {
         int length = xData.length - 1;//because last is starting point
-        int[] squaredDistances = new int[length];
-        for (int i = 0; i < length; i += species.length()) {
+        int[] squaredDistances = new int[length];//буфер для довжин шляхи між містами
+        for (int i = 0; i < length; i += species.length()) {//даний цикл обраховує лише шляхи між містами
             var mask = species.indexInRange(i, length);
-            IntVector x1Vec = IntVector.fromArray(species, xData, i, mask);
-            IntVector y1Vec = IntVector.fromArray(species, yData, i, mask);
-            IntVector x2Vec = IntVector.fromArray(species, xData, (i + 1), mask);
-            IntVector y2Vec = IntVector.fromArray(species, yData, (i + 1), mask);
-            var xDifference = x2Vec.sub(x1Vec);
-            var xSquared = xDifference.mul(xDifference);
-            var yDifference = y2Vec.sub(y1Vec);
-            var ySquared = yDifference.mul(yDifference);
-            var distance = ySquared.add(xSquared);
-            distance.intoArray(squaredDistances, i, mask);
+            IntVector x1Vec = IntVector.fromArray(species, xData, i, mask);//x1
+            IntVector y1Vec = IntVector.fromArray(species, yData, i, mask);//y1
+            IntVector x2Vec = IntVector.fromArray(species, xData, (i + 1), mask);//x2
+            IntVector y2Vec = IntVector.fromArray(species, yData, (i + 1), mask);//y2
+            var xDifference = x2Vec.sub(x1Vec);//dx
+            var xSquared = xDifference.mul(xDifference);//dx^2
+            var yDifference = y2Vec.sub(y1Vec);//dy
+            var ySquared = yDifference.mul(yDifference);//dy^2
+            var distance = ySquared.add(xSquared);//dx^2+dy^2
+            distance.intoArray(squaredDistances, i, mask);//save dx^2+dy^2
         }
+        //тепер обраховуємо довжину шляху кожної хромосоми та записуємо у масив pathLengths
         reduceDistancesToPaths(pathLengths, squaredDistances);
     }
 
