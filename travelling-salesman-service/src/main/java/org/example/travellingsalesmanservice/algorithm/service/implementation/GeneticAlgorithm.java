@@ -121,7 +121,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
     }
 
     private SavedPopulation initSaved() {
-        return new SavedPopulation(pathLengths.length / 2);
+        return new SavedPopulation(pathLengths.length / 3);
     }
 
     private void handleSimpleTask() {
