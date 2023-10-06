@@ -70,7 +70,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
             }
         }
 
-        public void setCurrent(Chromosome chromosome){
+        public void setCurrent(Chromosome chromosome) {
             if (list.size() < (limit + 1)) {
                 list.add(chromosome);
             } else {
@@ -121,7 +121,7 @@ class GeneticAlgorithm implements TravellingSalesmanSolver {//клас відп�
     }
 
     private SavedPopulation initSaved() {
-        return new SavedPopulation(pathLengths.length / 3);
+        return new SavedPopulation(pathLengths.length / 2);
     }
 
     private void handleSimpleTask() {
