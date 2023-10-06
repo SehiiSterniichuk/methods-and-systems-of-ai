@@ -2,7 +2,7 @@
 
 ## Genetic Algorithm 🧬
 ### Task: ✈️
-Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city exactly once and returns to the origin city?
+Given a list of cities, what is the shortest possible route that visits each city exactly once and returns to the origin city?
 ### Functionality:
 - Collecting cities to travel on the map of Ukraine 💙💛
 - Storing and loading dataset of points from the MongoDB <img src="./methods-and-systems-of-ai-web/src/img/mongodb_transparent.png"  style="height: 1rem"/>
