@@ -1,10 +1,10 @@
-package com.example.astarservice;
+package com.example.expertsystemservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AStarServiceApplicationTests {
+class ExpertSystemServiceApplicationTests {
 
     @Test
     void contextLoads() {

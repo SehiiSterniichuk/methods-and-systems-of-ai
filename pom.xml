@@ -26,7 +26,7 @@
     <modules>
         <module>methods-and-systems-of-ai-web</module>
         <module>travelling-salesman-service</module>
-        <module>a-star-service</module>
+        <module>expert-system-service</module>
     </modules>
     <repositories>
         <repository>
