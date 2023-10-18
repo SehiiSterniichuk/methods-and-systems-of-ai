@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/expert-system/rule")
@@ -31,12 +33,17 @@ public class RuleController {
     }
 
     @DeleteMapping("/{id}")
-    public long deleteRule(@PathVariable long id){
+    public long deleteRule(@PathVariable long id) {
         return service.delete(id);
     }
 
     @DeleteMapping("/all-hierarchy/{id}")
-    public long deleteAllRuleHierarchy(@PathVariable long id){
+    public long deleteAllRuleHierarchy(@PathVariable long id) {
         return service.deleteAll(id);
+    }
+
+    @DeleteMapping("/all")
+    public List<Long> deleteAll() {
+        return service.deleteAll();
     }
 }

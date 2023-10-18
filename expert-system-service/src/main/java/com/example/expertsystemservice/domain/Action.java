@@ -31,4 +31,8 @@ public class Action {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    public List<Action> toUnmodifiableList() {
+        return List.of(this);
+    }
 }
