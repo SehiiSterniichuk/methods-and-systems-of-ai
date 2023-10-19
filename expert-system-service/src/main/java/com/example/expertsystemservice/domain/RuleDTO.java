@@ -6,7 +6,7 @@ import lombok.Builder;
 
 import java.util.List;
 
-@Builder
+@Builder(toBuilder = true)
 public record RuleDTO(Long id,
                       @NotBlank
                       String name,
@@ -18,5 +18,9 @@ public record RuleDTO(Long id,
 
     public List<RuleDTO> toUnmodifiableList(){
         return List.of(this);
+    }
+
+    public RuleDTO withId(Long id){
+        return new RuleDTO(id, this.name, this.condition, this.thenAction, this.elseAction);
     }
 }

@@ -22,7 +22,7 @@ public class GraphRuleService implements RuleService {
     }
 
     @Override
-    public long createNewRule(PostRuleRequest request) {
+    public List<Long> createNewRule(PostRuleRequest request) {
         List<RuleDTO> rules = request.rules();
         int start = 0;
         List<Rule> newRulesToSave = new ArrayList<>(rules.size());
@@ -32,22 +32,61 @@ public class GraphRuleService implements RuleService {
             Rule entity = toEntity(rule, rules, processedNewRules);
             newRulesToSave.add(entity);
         }
-        for (int i = 0; i < newRulesToSave.size(); i++) {
-            repository.save(newRulesToSave.get(i));
-        }
-        return repository.findRuleByName(newRulesToSave.getFirst().getName())
-                .map(Rule::getId).orElse(-1L);
+        return saveAllTreeRules(newRulesToSave);
     }
+
+    private List<Long> saveAllTreeRules(List<Rule> newRulesToSave) {
+        List<Long> ids = new ArrayList<>(newRulesToSave.size());
+        newRulesToSave.forEach(rule -> saveRule(rule, ids));
+        return ids;
+    }
+
+    private void saveRule(Rule rule, List<Long> ids) {
+        if (repository.findRuleByIdOrName(rule.getId(), rule.getName()).isPresent()) {
+            return;
+        }
+        var saved = repository.save(rule);
+        ids.add(saved.getId());
+//                    connectRuleToActions(ids, saved, ActionRelationship.THEN);
+//                    connectRuleToActions(ids, saved, ActionRelationship.ELSE);
+    }
+
+//    private void connectRuleToActions(List<Long> ids, Rule rule, ActionRelationship relationship) {
+//        var actions = switch (relationship) {
+//            case THEN -> rule.getThenAction();
+//            case ELSE -> rule.getElseAction();
+//        };
+//        for (var action : actions) {
+//            Action savedAction = saveAction(action, ids);
+//            switch (relationship){
+//                case THEN -> repository.connectThenById(rule, savedAction);
+//                case ELSE -> repository.connectElseById(rule, savedAction);
+//            }
+//        }
+//    }
+
+//    private Action saveAction(Action action, List<Long> ids) {
+//        return actionRepository.findActionByIdOrName(action.getId(), action.getName())
+//                .orElseGet(() -> {
+//                    Action saved = actionRepository.save(action);
+//                    for (var gotoRule : action.getGotoAction()) {
+//                        Rule savedRule = saveRule(gotoRule, ids);
+//                        repository.connectGoto(action, savedRule, GotoRelationship.GOTO);
+//                    }
+//                    return saved;
+//                });
+//    }
+
 
     private Rule toEntity(RuleDTO rule, List<RuleDTO> rules, Map<String, Rule> processedNewRules) {
         List<ActionDTO> thenAction = rule.thenAction();
         List<ActionDTO> elseAction = rule.elseAction();
-        List<Action> thenEntity = null;
-        List<Action> elseEntity = null;
-        if(thenAction != null){
+        List<Action> thenEntity = List.of();
+        List<Action> elseEntity = List.of();
+        if (thenAction != null) {
             thenEntity = toActionEntity(rules, processedNewRules, thenAction);
         }
-        if(elseAction != null){
+        if (elseAction != null) {
             elseEntity = toActionEntity(rules, processedNewRules, elseAction);
         }
         return Rule.builder()
@@ -62,7 +101,7 @@ public class GraphRuleService implements RuleService {
         return then.stream()
                 .map(a -> {
                     List<RuleDTO> gotoAction = a.gotoAction();
-                    List<Rule> gotoRuleEntity = null;
+                    List<Rule> gotoRuleEntity = List.of();
                     if (gotoAction != null && !gotoAction.isEmpty()) {
                         gotoRuleEntity = new ArrayList<>(gotoAction.size());
                         for (RuleDTO actionRule : gotoAction) {

@@ -9,7 +9,7 @@ import java.util.List;
 public interface RuleService {
     RuleDTO getRule(GetRuleRequest request);
 
-    long createNewRule(PostRuleRequest request);
+    List<Long> createNewRule(PostRuleRequest request);
 
     long delete(long id);
 

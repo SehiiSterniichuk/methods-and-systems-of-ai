@@ -18,10 +18,12 @@ public class ActionConverter {
     }
 
     public List<ActionDTO> toUnmodifiableListDTO(List<Action> action){
+        if(action == null) return List.of();
         return action.stream().map(this::toDTO).toList();
     }
 
     public List<Action> toUnmodifiableListEntity(List<ActionDTO> action){
+        if(action == null) return List.of();
         return action.stream().map(this::toEntity).toList();
     }
 

@@ -28,7 +28,7 @@ public class RuleController {
     // if a rule uses existing rules as branches, then the branches must contain the ID OR the name of the existing rule
     // So, it means that each element of the list has 2 as maximum height of its hierarchy
     @PostMapping
-    public long postRules(@RequestBody @Valid PostRuleRequest request) {
+    public List<Long> postRules(@RequestBody @Valid PostRuleRequest request) {
         return service.createNewRule(request);
     }
 

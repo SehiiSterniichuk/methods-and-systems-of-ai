@@ -2,27 +2,20 @@ package com.example.expertsystemservice.service.implementation.converter;
 
 import com.example.expertsystemservice.domain.Rule;
 import com.example.expertsystemservice.domain.RuleDTO;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
 @Configuration
-@Setter
 public class RuleConverter {
     private ActionConverter converter;
 
-//    @Bean
-//    public RuleConverter ruleConverter() {
-//        RuleConverter ruleConverter = new RuleConverter();
-//        ruleConverter.setConverter(actionConverter(ruleConverter));
-//        return ruleConverter;
-//    }
-//
-//    @Bean
-//    public ActionConverter actionConverter(RuleConverter ruleConverter) {
-//        return new ActionConverter(ruleConverter);
-//    }
+    @Autowired
+    public void setConverter(ActionConverter converter) {
+        this.converter = converter;
+        converter.setConverter(this);
+    }
 
     public RuleDTO toDTO(Rule rule) {
         return new RuleDTO(rule.getId(), rule.getName(), rule.getCondition(),
