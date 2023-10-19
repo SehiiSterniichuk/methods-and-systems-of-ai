@@ -2,6 +2,7 @@ package com.example.expertsystemservice.repository;
 
 import com.example.expertsystemservice.domain.Rule;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.neo4j.repository.query.Query;
 
 import java.util.Optional;
 
@@ -41,5 +42,12 @@ public interface RuleRepository extends Neo4jRepository<Rule, Long> {
     void deleteByName(String name);
 
     Optional<Rule> findRuleById(long id);
+
+    @Query("""
+            MATCH (r:Rule)
+            RETURN r
+            LIMIT 1
+            """)
+    Optional<Rule> findAnyRule();
 }
 
