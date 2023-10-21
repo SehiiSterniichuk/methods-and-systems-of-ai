@@ -1,13 +1,15 @@
 package com.example.expertsystemservice.service.implementation.converter;
 
+import com.example.expertsystemservice.domain.Action;
+import com.example.expertsystemservice.domain.ActionDTO;
 import com.example.expertsystemservice.domain.Rule;
 import com.example.expertsystemservice.domain.RuleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Configuration
+@Component
 public class RuleConverter {
     private ActionConverter converter;
 
@@ -19,8 +21,20 @@ public class RuleConverter {
 
     public RuleDTO toDTO(Rule rule) {
         return new RuleDTO(rule.getId(), rule.getName(), rule.getCondition(),
+                rule.getDecisionInfo(),
                 converter.toUnmodifiableListDTO(rule.getThenAction()),
                 converter.toUnmodifiableListDTO(rule.getElseAction()));
+    }
+
+    public Rule toEntity(RuleDTO rule, List<Action> thenEntity, List<Action> elseEntity) {
+        return new Rule(rule.id(), rule.name(), rule.condition(), rule.decisionInfo(), thenEntity, elseEntity);
+    }
+
+    public RuleDTO toLeafDTO(Rule rule) {
+        return new RuleDTO(rule.getId(), rule.getName(), rule.getCondition(),
+                rule.getDecisionInfo(),
+                null,
+                null);
     }
 
     public List<RuleDTO> toUnmodifiableListDTO(List<Rule> action) {
@@ -33,8 +47,14 @@ public class RuleConverter {
 
     public Rule toEntity(RuleDTO ruleDTO) {
         return new Rule(ruleDTO.id(), ruleDTO.name(), ruleDTO.condition(),
+                ruleDTO.decisionInfo(),
                 converter.toUnmodifiableListEntity(ruleDTO.thenAction()),
                 converter.toUnmodifiableListEntity(ruleDTO.elseAction()));
+    }
+
+    public RuleDTO toDTO(Rule rule, List<ActionDTO> thenActions, List<ActionDTO> elseActions) {
+        return new RuleDTO(rule.getId(), rule.getName(), rule.getCondition(),
+                rule.getDecisionInfo(), thenActions, elseActions);
     }
 }
 

@@ -1,6 +1,7 @@
 package com.example.expertsystemservice.service.implementation;
 
 import com.example.expertsystemservice.config.Config;
+import com.example.expertsystemservice.domain.decision.DecisionInfo;
 import com.example.expertsystemservice.domain.PostRuleRequest;
 import com.example.expertsystemservice.domain.RuleDTO;
 import com.example.expertsystemservice.service.DefaultRulesLoaderService;
@@ -29,8 +30,19 @@ public class JsonFileDefaultRulesLoaderService implements DefaultRulesLoaderServ
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return ruleService.createNewRule(PostRuleRequest.builder()
-                .rules(Arrays.stream(rules).toList())
-                .build());
+        List<RuleDTO> list = Arrays.stream(rules)
+                .map(r -> {
+                    if (r.decisionInfo() == null || r.decisionInfo().type() == null) {
+                        return r.toBuilder()
+                                .decisionInfo(DecisionInfo.BINARY)
+                                .build();
+                    }
+                    return r;
+                })
+                .toList();
+        PostRuleRequest request = PostRuleRequest.builder()
+                .rules(list)
+                .build();
+        return ruleService.createNewRule(request);
     }
 }

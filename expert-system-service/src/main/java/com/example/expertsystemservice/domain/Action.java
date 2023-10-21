@@ -22,6 +22,8 @@ public class Action {
 
     private String name;
 
+    private String formula;
+
     @Relationship(type = "GOTO", direction = Relationship.Direction.OUTGOING)
     private List<Rule> gotoAction = new ArrayList<>(0);
 

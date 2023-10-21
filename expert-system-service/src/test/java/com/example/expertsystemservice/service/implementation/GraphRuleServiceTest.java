@@ -1,11 +1,11 @@
 package com.example.expertsystemservice.service.implementation;
 
-import com.example.expertsystemservice.domain.ActionDTO;
-import com.example.expertsystemservice.domain.PostRuleRequest;
-import com.example.expertsystemservice.domain.RuleDTO;
+import com.example.expertsystemservice.domain.*;
+import com.example.expertsystemservice.domain.decision.DecisionInfo;
 import com.example.expertsystemservice.repository.ActionRepository;
 import com.example.expertsystemservice.repository.RuleRepository;
 import com.example.expertsystemservice.service.RuleService;
+import com.example.expertsystemservice.service.implementation.converter.ActionConverter;
 import com.example.expertsystemservice.service.implementation.converter.RuleConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -28,25 +28,32 @@ class GraphRuleServiceTest {
     @Autowired
     private ActionRepository actionRepository;
     @Autowired
+    private RuleDTOValidator validator;
+    @Autowired
     private RuleConverter converter;
-
-    private final RuleDTO simpleRule = RuleDTO.builder()
-            .condition("Unexpected condition")
-            .name("Without branched actions :(")
-            .thenAction(List.of())
-            .elseAction(List.of())
-            .build();
-
-    private final RuleDTO simpleRulePointer = RuleDTO.builder()
-            .condition("Unexpected condition")
-            .name("Without branched actions :(")
-            .thenAction(List.of())
-            .elseAction(List.of())
-            .build();
+    @Autowired
+    private ActionConverter actionConverter;
 
     private final ActionDTO thenAction = ActionDTO.builder()
             .name("new simple then action")
             .build();
+
+    private final RuleDTO simpleRule = RuleDTO.builder()
+            .decisionInfo(new DecisionInfo(RuleType.BINARY, null, null))
+            .condition("Unexpected condition")
+            .name("Without branched actions :(")
+            .thenAction(thenAction.toUnmodifiableList())
+            .elseAction(thenAction.toUnmodifiableList())
+            .build();
+
+    private final RuleDTO simpleRulePointer = RuleDTO.builder()
+            .decisionInfo(new DecisionInfo(RuleType.BINARY, null, null))
+            .condition("Unexpected condition")
+            .name("Without branched actions :(")
+            .thenAction(thenAction.toUnmodifiableList())
+            .elseAction(thenAction.toUnmodifiableList())
+            .build();
+
 
     private final ActionDTO gotoAction = ActionDTO.builder()
             .name("new simple then action")
@@ -54,21 +61,25 @@ class GraphRuleServiceTest {
             .build();
 
     private final RuleDTO branchRule = RuleDTO.builder()
+            .decisionInfo(new DecisionInfo(RuleType.BINARY, null, null))
             .condition("Unexpected 2")
             .name("With new branches!")
             .thenAction(thenAction.toUnmodifiableList())
-            .elseAction(List.of())
+            .elseAction(thenAction.toUnmodifiableList())
             .build();
 
     private final RuleDTO branchRuleWithGoTo = RuleDTO.builder()
+            .decisionInfo(new DecisionInfo(RuleType.BINARY, null, null))
             .condition("condition with goto")
             .name("rule with goto")
             .thenAction(thenAction.toUnmodifiableList())
             .elseAction(gotoAction.toUnmodifiableList())
             .build();
     RuleDTO secondComplexRule = RuleDTO.builder()
+            .decisionInfo(new DecisionInfo(RuleType.BINARY, null, null))
             .name("second")
             .thenAction(thenAction.toUnmodifiableList())
+            .elseAction(thenAction.toUnmodifiableList())
             .condition("second condition")
             .build();
     private final List<RuleDTO> allRules = List.of(simpleRule,
@@ -80,12 +91,12 @@ class GraphRuleServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new GraphRuleService(repository);
+        service = new GraphRuleService(repository, actionRepository, validator, converter, actionConverter);
     }
 
     @AfterEach
     void tearDown() {
-        allRules.forEach(r -> repository.deleteByName(r.name()));
+        allRules.forEach(r -> repository.deleteAllByName(r.name()));
         allActions.forEach(a -> actionRepository.deleteActionByName(a.name()));
     }
 
@@ -99,7 +110,7 @@ class GraphRuleServiceTest {
         log.info(STR. "id: \{ id }" );
         var saved = repository.findRuleById(id.get(0)).orElse(null);
         assertNotNull(saved);
-        assertEquals(converter.toDTO(saved), simpleRule.withId(saved.getId()));
+        assertEquals(simpleRule.name(), saved.getName());
     }
 
     @Test

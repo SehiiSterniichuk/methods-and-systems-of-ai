@@ -26,6 +26,6 @@ class RuleRepositoryTest {
         repository.save(rule);
         exist = repository.existsRuleByName(rule.getName());
         assertTrue(exist);
-        repository.deleteByName(rule.getName());
+        repository.deleteAllByName(rule.getName());
     }
 }

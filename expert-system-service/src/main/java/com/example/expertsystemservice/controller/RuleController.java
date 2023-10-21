@@ -18,9 +18,12 @@ public class RuleController {
     private final RuleService service;
 
     //method to retrieve a rule and its hierarchy at a given depth
-    @GetMapping
-    public RuleDTO getRule(@RequestBody @Valid GetRuleRequest request) {
-        return service.getRule(request);
+    @GetMapping("/{id}/{depth}")
+    public RuleDTO getRule(@PathVariable long id, @PathVariable long depth) {
+        return service.getRule(GetRuleRequest.builder()
+                        .depth(depth)
+                        .id(id)
+                .build());
     }
 
     //create a new rule. If the rule uses new rules as branches
@@ -43,7 +46,7 @@ public class RuleController {
     }
 
     @DeleteMapping("/all")
-    public List<Long> deleteAll() {
+    public long deleteAll() {
         return service.deleteAll();
     }
 }

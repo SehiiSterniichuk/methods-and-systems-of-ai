@@ -8,8 +8,14 @@ import java.util.List;
 public record ActionDTO(long id,
 
                         String name,
+                        String formula,
                         List<RuleDTO> gotoAction) {
-    public List<ActionDTO> toUnmodifiableList(){
+
+    public boolean isFormulaNullOrBlank() {
+        return formula == null || formula.isBlank();
+    }
+
+    public List<ActionDTO> toUnmodifiableList() {
         return List.of(this);
     }
 }

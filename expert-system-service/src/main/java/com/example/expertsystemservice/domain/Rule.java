@@ -1,10 +1,8 @@
 package com.example.expertsystemservice.domain;
 
+import com.example.expertsystemservice.domain.decision.DecisionInfo;
 import lombok.*;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +22,21 @@ public class Rule {
 
     private String condition;
 
+    private RuleType type;
+
+    private String formula;
+
+    private List<String> variables;
+
     @Relationship(type = "THEN", direction = Relationship.Direction.OUTGOING)
     private List<Action> thenAction = new ArrayList<>(1);
 
     @Relationship(type = "ELSE", direction = Relationship.Direction.OUTGOING)
     private List<Action> elseAction= new ArrayList<>(1);
+
+    public Rule(Long id, String name, String condition, DecisionInfo decisionInfo, List<Action> thenEntity, List<Action> elseEntity) {
+        this(id, name, condition, decisionInfo.type(), decisionInfo.formula(), decisionInfo.variables(), thenEntity, elseEntity);
+    }
 
     @Override
     public String toString() {
@@ -37,5 +45,9 @@ public class Rule {
                 ", name='" + name + '\'' +
                 ", condition='" + condition + '\'' +
                 '}';
+    }
+
+    public DecisionInfo getDecisionInfo(){
+        return new DecisionInfo(type, formula, variables);
     }
 }
