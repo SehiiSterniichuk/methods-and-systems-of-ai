@@ -1,0 +1,39 @@
+@import "../../index.css";
+
+$background-color: #404459;
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: $background-color;
+  justify-content: center;
+  display: flex;
+}
+
+.expert-system-mode-wrapper {
+  justify-self: center;
+  margin-top: 5vh;
+
+  h1 {
+    color: #fff;
+    top: 0;
+    font-size: 50px;
+    margin-bottom: 10rem;
+    text-align: center;
+  }
+
+  button {
+    font-size: 40px;
+    padding: 10px;
+    color: $background-color;
+    margin: 3px;
+    border-radius: 22px;
+    font-family: -apple-system, "Times New Roman", Arial, serif;
+  }
+
+  button:hover {
+    scale: 100.3%;
+  }
+}
