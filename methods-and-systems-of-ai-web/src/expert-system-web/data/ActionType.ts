@@ -15,6 +15,6 @@ export enum RuleType {
 }
 
 export const ruleTypes: RuleType[] = [RuleType.BINARY, RuleType.BINARY_FORMULA, RuleType.VALUE_FORMULA, RuleType.FORMULA];
-export const actionTypes: ActionDecisionType[] = [ActionDecisionType.GOTO, ActionDecisionType.RESULT];
+export const actionDecisionTypes: ActionDecisionType[] = [ActionDecisionType.RESULT,ActionDecisionType.GOTO];
 
 export default ActionType;

@@ -7,7 +7,7 @@ function ExpertPage() {
     return (
         <main className={"expert-page-main"}>
             <h1>Expert System. Rule creation</h1>
-            <RuleScope/>
+            <RuleScope id={1}/>
         </main>
     );
 }
