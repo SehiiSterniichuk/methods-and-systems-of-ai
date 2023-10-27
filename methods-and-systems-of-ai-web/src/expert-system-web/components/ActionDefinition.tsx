@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {ActionDecisionType, actionDecisionTypes, ActionType, RuleType} from "../data/ActionType";
+import ActionDTO, {returnEmptyRuleOnlyWithId, returnEmptyRuleOnlyWithName} from "../data/ActionDTO";
 
 interface Props {
     actionType: ActionType
@@ -7,16 +8,28 @@ interface Props {
     scopeId: number
     parentRuleType: RuleType
     addNew: () => void
+    actionObj: ActionDTO
 }
 
-function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew}: Props) {
+function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew, actionObj}: Props) {
     const titleType = actionType == ActionType.THEN ? "Then" : "Else";
-    const title = `${titleType} action definition`;
+    const title = `${titleType} action #${scopeId}.${id}`;
     const [actionDecisionType, setActionDecisionType] = useState(actionDecisionTypes[0]);
     const [isFromDatabase, setIsFromDatabase] = useState(false)
-    const [name, setName] = useState("");
-    const [formula, setFormula] = useState("")
-
+    useEffect(() => {
+        if(actionDecisionType === ActionDecisionType.RESULT){
+            actionObj.gotoAction = undefined;
+        }
+    }, [actionDecisionType]);
+    useEffect(() => {
+        if(actionObj.gotoAction && actionObj.gotoAction.length > 0){
+            if(isFromDatabase){
+                actionObj.gotoAction[0].id = undefined;
+            }else {
+                actionObj.gotoAction[0].name = undefined;
+            }
+        }
+    }, [isFromDatabase]);
     function selectTypeStrategy(e: React.ChangeEvent<HTMLSelectElement>) {
         if (e.target == null || e.target.value == null) {
             return;
@@ -45,11 +58,48 @@ function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew}: Pro
         }
     }
 
+    function setStringHandler(e: React.FormEvent<any>,
+                              callback: (a: string) => void) {
+        if (e.currentTarget == null || e.currentTarget.value == null) {
+            return;
+        }
+        const newName = e.currentTarget.value;
+        const updatedName = newName.replace(/\s+/g, ' ');
+        callback(updatedName);
+        e.currentTarget.value = updatedName;
+    }
 
+    function setNameOfNewRule(s: string) {
+        if(isFromDatabase){
+            return;
+        }
+        if (actionObj.gotoAction && actionObj.gotoAction.length > 0) {
+            actionObj.gotoAction[0].id = undefined;
+            actionObj.gotoAction[0].name = s;
+            return;
+        }
+        const rule = returnEmptyRuleOnlyWithName(s);
+        actionObj.gotoAction = [rule]
+        console.log(actionObj);
+    }
+
+    function setGotoId(s: string) {
+        if(!isFromDatabase){
+            return;
+        }
+        const newActionId: number = Number.parseInt(s);
+        if (actionObj.gotoAction && actionObj.gotoAction.length > 0) {
+            actionObj.gotoAction[0].id = newActionId;
+            actionObj.gotoAction[0].name = undefined;
+            return;
+        }
+        const rule = returnEmptyRuleOnlyWithId(newActionId);
+        actionObj.gotoAction = [rule]
+        console.log(actionObj);
+    }
     return (
         <div key={`action_${actionType}_${id}_from_scope_${scopeId}`}
              className="section action-definition-section">
-            <p>Parent: {parentRuleType}</p>
             <div className="row block-header">
                 <p className={"block-title"}>{title}</p>
                 <button onClick={addNew}
@@ -61,7 +111,7 @@ function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew}: Pro
                     className="long-input-wrapper">
                     <div className="input-title-pair long-input">
                         <p>Action</p>
-                        <textarea className={"rectangle-input"}/>
+                        <textarea onChange={(e) => setStringHandler(e, (s)=>actionObj.name = s)} className={"rectangle-input"}/>
                     </div>
                 </div>
                 {isFromDatabase && actionDecisionType == ActionDecisionType.GOTO ||
@@ -71,7 +121,7 @@ function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew}: Pro
                         className="long-input-wrapper">
                         <div className="input-title-pair long-input">
                             <p>Name of new rule</p>
-                            <textarea className={"rectangle-input"}/>
+                            <textarea onChange={(e) => setStringHandler(e, setNameOfNewRule)} className={"rectangle-input"}/>
                         </div>
                     </div>}
 
@@ -106,13 +156,17 @@ function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew}: Pro
                             key={`rule_id_input_from_action_${actionType}_${id}_from_scope_${scopeId}`}
                             className="input-title-pair ">
                             <p>Rule ID</p>
-                            <input type="number" className={"id-input rectangle-input"} min={1} maxLength={50}/>
+                            <input type="number"
+                                   onChange={e=>setStringHandler(e, s=>setGotoId(s))}
+                                   className={"id-input rectangle-input"} min={1} maxLength={50}/>
                         </div>}
                     {parentRuleType == RuleType.BINARY ? null : <div
                         key={`formula_input_from_action_${actionType}_${id}_from_scope_${scopeId}`}
                         className="input-title-pair ">
                         <p>Formula</p>
-                        <input className={"rectangle-input"} type="text"/>
+                        <input
+                            onChange={(e) => setStringHandler(e, (s)=>actionObj.formula = s)}
+                            className={"rectangle-input"} type="text"/>
                     </div>}
 
                 </div>

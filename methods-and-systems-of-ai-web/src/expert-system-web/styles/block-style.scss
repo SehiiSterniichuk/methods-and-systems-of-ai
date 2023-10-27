@@ -2,7 +2,7 @@
 
 .rule-scope{
   border: 3px solid #fff;
-  width: 85%;
+  width: 100%;
 }
 #root{
   width: 100%;
@@ -11,6 +11,7 @@ main{
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-inline: 7.5%;
 }
 .section{
   padding-block: 1rem;
@@ -93,9 +94,27 @@ main{
     }
   }
 }
-.red{
-  color:red;
+
+.rule-scope{
+  margin-bottom: 3rem;
 }
-.green{
-  color:green;
+
+.post-new-rules-btn{
+  align-self: end;
+  background: #fff;
+  padding: .5rem;
+  border-radius: .5rem;
+  font-size: 1.25rem;
+  color: $background-color;
+  font-weight: bold;
+  border: none;
+}
+.button-send-wrapper{
+  align-self: end;
+  margin-bottom: 2rem;
+  align-items: center;
+  p{
+    color: #fff;
+    margin-right: 1.5rem;
+  }
 }

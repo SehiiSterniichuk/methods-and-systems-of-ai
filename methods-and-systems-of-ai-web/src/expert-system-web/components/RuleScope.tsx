@@ -1,43 +1,58 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RuleDefinition from './RuleDefinition';
 import ActionDefinition from './ActionDefinition';
 import actionType, {ActionType, RuleType} from '../data/ActionType';
 import '../styles/block-style.scss';
+import {returnEmptyActionWithId, RuleDTO} from "../data/ActionDTO";
 
 interface Props {
-    id: number;
+    ruleScopeId: number;
+    ruleObj: RuleDTO
+    addNewRule: ()=>void
 }
 
-function RuleScope({id}: Props) {
+function RuleScope({ruleScopeId, ruleObj, addNewRule}: Props) {
     const [ruleType, setRuleType] = useState(RuleType.BINARY);
-    const rule = RuleDefinition({id: 1, ruleType: ruleType, setRuleType: setRuleType, scopeId: id});
-    const [thenActions, setThenActions] = useState([1]); // Store the list of action IDs
-    const [elseActions, setElseActions] = useState([1]); // Store the list of action IDs
-
+    const [thenActions, setThenActions] = useState([returnEmptyActionWithId(1)]); // Store the list of action IDs
+    const [elseActions, setElseActions] = useState([returnEmptyActionWithId(1)]); // Store the list of action IDs
+    useEffect(() => {
+        ruleObj.thenAction = thenActions;
+    }, [thenActions]);
+    useEffect(() => {
+        ruleObj.elseAction = elseActions;
+    }, [elseActions]);
     const addNewAction = (t: ActionType) => {
-        if(ruleType === RuleType.BINARY){
+        if (ruleType === RuleType.BINARY) {
             return;
         }
         if (actionType.THEN === t) {
             const newActionId = thenActions.length + 1;
-            const numbers = [...thenActions, newActionId];
+            const numbers = [...thenActions, returnEmptyActionWithId(newActionId)];
             setThenActions(numbers);
         } else {
             const newActionId = elseActions.length + 1;
-            const numbers = [...elseActions, newActionId];
+            const numbers = [...elseActions, returnEmptyActionWithId(newActionId)];
             setElseActions(numbers);
         }
     };
 
     return (
-        <section key={`rule_scope_${id}`} className={'rule-scope'}>
-            {rule.render}
+        <section key={`rule_scope_section_${ruleScopeId}`} className={'rule-scope'}>
+            <RuleDefinition key={`RULE_DEFINITION_COMPONENT_${ruleScopeId}`} ruleObj={ruleObj} id={ruleScopeId}
+                            addNewRule={addNewRule}
+                            scopeId={ruleScopeId} ruleType={ruleType} setRuleType={setRuleType}/>
             {thenActions.map(x => {
-                return <ActionDefinition key={"ActionDefinition " + x} id={x} scopeId={id} actionType={ActionType.THEN} parentRuleType={ruleType}
+                return <ActionDefinition key={"ActionDefinition " + x}
+                                         actionObj={x}
+                                         id={x.id ? x.id : -1} scopeId={ruleScopeId} actionType={ActionType.THEN}
+                                         parentRuleType={ruleType}
                                          addNew={() => addNewAction(ActionType.THEN)}/>
             })}
-            {thenActions.map(x => {
-                return <ActionDefinition key={"ActionDefinition " + x} id={x} scopeId={id} actionType={ActionType.ELSE} parentRuleType={ruleType}
+            {elseActions.map(x => {
+                return <ActionDefinition key={"ActionDefinition " + x}
+                                         actionObj={x}
+                                         id={x.id ? x.id : -1} scopeId={ruleScopeId} actionType={ActionType.ELSE}
+                                         parentRuleType={ruleType}
                                          addNew={() => addNewAction(ActionType.ELSE)}/>
             })}
         </section>
