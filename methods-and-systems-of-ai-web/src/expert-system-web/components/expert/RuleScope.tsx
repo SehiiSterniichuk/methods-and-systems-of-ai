@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import RuleDefinition from './RuleDefinition';
 import ActionDefinition from './ActionDefinition';
-import actionType, {ActionType, RuleType} from '../data/ActionType';
-import '../styles/block-style.scss';
-import {returnEmptyActionWithId, RuleDTO} from "../data/ActionDTO";
+import actionType, {ActionType, RuleType} from '../../data/ActionType';
+import '../../styles/block-style.scss';
+import {returnEmptyActionWithId, RuleDTO} from "../../data/ActionDTO";
 
 interface Props {
     ruleScopeId: number;

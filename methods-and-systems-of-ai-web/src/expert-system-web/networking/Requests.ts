@@ -1,4 +1,3 @@
-import {PostTaskRequest} from "../../travelling-salesman-web/data/TaskData";
 import {SERVER_URL} from "../../travelling-salesman-web/data/Constants";
 import {RuleDTO} from "../data/ActionDTO";
 
@@ -24,4 +23,15 @@ export async function sendRules(rules: RuleDTO[]) {
     } catch (error) {
         throw error;
     }
+}
+
+export async function findQuestions(string: string) {
+    const response = await fetch(`${SERVER_URL}/api/v1/expert-system/question/${string}`, {
+        method: 'GET',
+    });
+    if (!response.ok) {
+        const status = response.status;
+        console.error(`HTTP error! Status: ${status}`);
+    }
+    return response;
 }

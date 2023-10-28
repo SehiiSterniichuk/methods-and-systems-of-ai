@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import "./styles/default-expert-system.scss"
-import ExpertPage from "./components/ExpertPage";
+import ExpertPage from "./components/expert/ExpertPage";
+import UserPage from "./components/user/UserPage";
 
 enum Mode {
     DEFAULT, EXPERT, USER
@@ -18,7 +19,7 @@ function ExpertSystemApp() {
         </div>
     </>;
     const expertPage = <ExpertPage/>
-    const userPage = <></>;
+    const userPage = <UserPage/>;
     let page;
     switch (mode) {
         case Mode.DEFAULT:

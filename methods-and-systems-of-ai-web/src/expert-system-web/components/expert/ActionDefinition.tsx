@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {ActionDecisionType, actionDecisionTypes, ActionType, RuleType} from "../data/ActionType";
-import ActionDTO, {returnEmptyRuleOnlyWithId, returnEmptyRuleOnlyWithName} from "../data/ActionDTO";
+import {ActionDecisionType, actionDecisionTypes, ActionType, RuleType} from "../../data/ActionType";
+import ActionDTO, {returnEmptyRuleOnlyWithId, returnEmptyRuleOnlyWithName} from "../../data/ActionDTO";
 
 interface Props {
     actionType: ActionType
@@ -160,7 +160,7 @@ function ActionDefinition({actionType, id, scopeId, parentRuleType, addNew, acti
                                    onChange={e=>setStringHandler(e, s=>setGotoId(s))}
                                    className={"id-input rectangle-input"} min={1} maxLength={50}/>
                         </div>}
-                    {parentRuleType == RuleType.BINARY ? null : <div
+                    {parentRuleType == RuleType.BINARY || parentRuleType == RuleType.BINARY_FORMULA ? null : <div
                         key={`formula_input_from_action_${actionType}_${id}_from_scope_${scopeId}`}
                         className="input-title-pair ">
                         <p>Formula</p>

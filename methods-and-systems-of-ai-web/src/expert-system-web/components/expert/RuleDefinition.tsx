@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {RuleType, ruleTypes} from "../data/ActionType";
-import {RuleDTO} from "../data/ActionDTO";
+import {RuleType, ruleTypes} from "../../data/ActionType";
+import {RuleDTO} from "../../data/ActionDTO";
 
 interface Props {
     id: number
