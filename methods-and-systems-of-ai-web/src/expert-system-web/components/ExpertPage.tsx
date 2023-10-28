@@ -28,7 +28,7 @@ function ExpertPage() {
             const isValidName =
                 ruleDTO.name === undefined ||
                 ruleDTO.name.trim() === "" ||
-                rules.find(x=>x.name === ruleDTO.name) == undefined;
+                rules.find(x=>x.name === ruleDTO.name) === undefined;
             if(isValidName){
                 return -1;
             }
@@ -39,8 +39,8 @@ function ExpertPage() {
             for (let i = 0; i < actionList.length; i++) {
                 let action = actionList[i];
                 if ((action.name === undefined || action.name.trim() === "")
-                    && (action.gotoAction === undefined || action.gotoAction.length == 0 ||
-                        (checkGoToAction(action.gotoAction[0]) != -1)
+                    && (action.gotoAction === undefined || action.gotoAction.length === 0 ||
+                        (checkGoToAction(action.gotoAction[0]) !== -1)
                     )
                 ) {
                     return i;
@@ -52,7 +52,7 @@ function ExpertPage() {
         function checkActionPower(actionList: ActionDTO[], r: RuleDTO): number {
             const type = r.decisionInfo?.type || RuleType.BINARY;
             if (type === RuleType.BINARY || type === RuleType.BINARY_FORMULA) {
-                return r.id as number;
+                return -1;
             }
             for (let i = 0; i < actionList.length; i++) {
                 let action = actionList[i];
@@ -64,12 +64,12 @@ function ExpertPage() {
             return -1;
         }
         function checkActions(action: ActionDTO[] | undefined, actionName: string, r: RuleDTO) {
-            if (action === undefined || action.length == 0) {
+            if (action === undefined || action.length === 0) {
                 setMessage(`${actionName} undefined for rule: #${r.id}`)
                 return 1;
             }
             const aId = checkAction(action);
-            if (aId != -1) {
+            if (aId !== -1) {
                 setMessage(`${actionName} undefined for rule action: #${r.id}.${aId}`)
                 return 2;
             }
@@ -77,15 +77,15 @@ function ExpertPage() {
         }
         for (let i = 0; i < rules.length; i++) {
             const r = rules[i];
-            if (r.name == undefined || r.name.trim() === "") {
+            if (r.name === undefined || r.name.trim() === "") {
                 setMessage(`missed name for the rule #${r.id}`)
                 return;
             }
-            if (r.condition == undefined || r.condition.trim() === "") {
+            if (r.condition === undefined || r.condition.trim() === "") {
                 setMessage(`missed question for the rule #${r.id}`)
                 return;
             }
-            if (r.decisionInfo?.type != RuleType.BINARY &&
+            if (r.decisionInfo?.type !== RuleType.BINARY &&
                 (r.decisionInfo?.formula === undefined || r.decisionInfo?.formula.trim() === "")) {
                 setMessage(`missed formula for the rule #${r.id}`)
                 return;
@@ -93,21 +93,21 @@ function ExpertPage() {
             const action = r.thenAction;
             const actionName = `thenAction`;
             const checkActionPurpose = checkActions(action, actionName, r);
-            if (checkActionPurpose != -1 ||
-                checkActionPower(r.thenAction || [], r) != -1) {
+            if (checkActionPurpose !== -1 ||
+                checkActionPower(r.thenAction || [], r) !== -1) {
                 break;
             }
 
             if (r.decisionInfo.type === RuleType.BINARY ||
                 r.decisionInfo.type === RuleType.BINARY_FORMULA) {
                 const elseIsValid = checkActions(r.elseAction, "elseAction", r);
-                if (elseIsValid != -1) {
+                if (elseIsValid !== -1) {
                     break;
                 }
-            } else if (checkActionPower(r.elseAction || [], r) != -1) {
+            } else if (checkActionPower(r.elseAction || [], r) !== -1) {
                 break;
             }
-
+            console.log("valid")
         }
     }
 

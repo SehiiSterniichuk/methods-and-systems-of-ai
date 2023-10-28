@@ -40,7 +40,7 @@ function RuleDefinition({id, scopeId, setRuleType, ruleType, ruleObj, addNewRule
         const filter = ruleTypes.filter(r => r.toString() == e.target.value);
         if (filter.length >= 1) {
             if (ruleObj.decisionInfo === undefined) {
-                ruleObj.decisionInfo = {type: ruleType, formula: formula, variables: variables};
+                ruleObj.decisionInfo = {type: filter[0], formula: formula, variables: variables};
             } else {
                 ruleObj.decisionInfo.type = filter[0];
             }
