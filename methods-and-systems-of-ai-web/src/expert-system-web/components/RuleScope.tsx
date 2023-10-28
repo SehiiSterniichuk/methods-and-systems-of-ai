@@ -42,14 +42,14 @@ function RuleScope({ruleScopeId, ruleObj, addNewRule}: Props) {
                             addNewRule={addNewRule}
                             scopeId={ruleScopeId} ruleType={ruleType} setRuleType={setRuleType}/>
             {thenActions.map(x => {
-                return <ActionDefinition key={"ActionDefinition " + x}
+                return <ActionDefinition key={`THEN ActionDefinitionID: ${x.id} scope: ${ruleScopeId}`}
                                          actionObj={x}
                                          id={x.id ? x.id : -1} scopeId={ruleScopeId} actionType={ActionType.THEN}
                                          parentRuleType={ruleType}
                                          addNew={() => addNewAction(ActionType.THEN)}/>
             })}
             {elseActions.map(x => {
-                return <ActionDefinition key={"ActionDefinition " + x}
+                return <ActionDefinition key={`ELSE ActionDefinitionID: ${x.id} scope: ${ruleScopeId}`}
                                          actionObj={x}
                                          id={x.id ? x.id : -1} scopeId={ruleScopeId} actionType={ActionType.ELSE}
                                          parentRuleType={ruleType}

@@ -17,19 +17,20 @@ function ExpertPage() {
     const [message, setMessage] = useState("");
 
     function sendNewRules() {
-        if(message.length >= 1){
+        if (message.length >= 1) {
             setMessage("");
         }
+
         function checkGoToAction(ruleDTO: RuleDTO) {
             const isProvidedId = ruleDTO.id === undefined || ruleDTO.id <= 0;
-            if(isProvidedId){
+            if (isProvidedId) {
                 return -1;
             }
             const isValidName =
                 ruleDTO.name === undefined ||
                 ruleDTO.name.trim() === "" ||
-                rules.find(x=>x.name === ruleDTO.name) === undefined;
-            if(isValidName){
+                rules.find(x => x.name === ruleDTO.name) === undefined;
+            if (isValidName) {
                 return -1;
             }
             return 0;
@@ -49,7 +50,7 @@ function ExpertPage() {
             return -1;
         }
 
-        function checkActionPower(actionList: ActionDTO[], r: RuleDTO): number {
+        function checkActionPower(actionList: ActionDTO[], r: RuleDTO, actionName: string): number {
             const type = r.decisionInfo?.type || RuleType.BINARY;
             if (type === RuleType.BINARY || type === RuleType.BINARY_FORMULA) {
                 return -1;
@@ -57,12 +58,13 @@ function ExpertPage() {
             for (let i = 0; i < actionList.length; i++) {
                 let action = actionList[i];
                 if (action.formula === undefined || action.formula.trim() === "") {
-                    setMessage(`missed formula for the action #${r.id}.${action.id}`)
+                    setMessage(`missed formula for the ${actionName} #${r.id}.${action.id}`)
                     return action.id as number;
                 }
             }
             return -1;
         }
+
         function checkActions(action: ActionDTO[] | undefined, actionName: string, r: RuleDTO) {
             if (action === undefined || action.length === 0) {
                 setMessage(`${actionName} undefined for rule: #${r.id}`)
@@ -75,6 +77,7 @@ function ExpertPage() {
             }
             return -1;
         }
+
         for (let i = 0; i < rules.length; i++) {
             const r = rules[i];
             if (r.name === undefined || r.name.trim() === "") {
@@ -94,17 +97,18 @@ function ExpertPage() {
             const actionName = `thenAction`;
             const checkActionPurpose = checkActions(action, actionName, r);
             if (checkActionPurpose !== -1 ||
-                checkActionPower(r.thenAction || [], r) !== -1) {
+                checkActionPower(r.thenAction || [], r, actionName) !== -1) {
                 break;
             }
 
+            const elseActionName = "elseAction";
             if (r.decisionInfo.type === RuleType.BINARY ||
                 r.decisionInfo.type === RuleType.BINARY_FORMULA) {
-                const elseIsValid = checkActions(r.elseAction, "elseAction", r);
+                const elseIsValid = checkActions(r.elseAction, elseActionName, r);
                 if (elseIsValid !== -1) {
                     break;
                 }
-            } else if (checkActionPower(r.elseAction || [], r) !== -1) {
+            } else if (checkActionPower(r.elseAction || [], r, elseActionName) !== -1) {
                 break;
             }
             console.log("valid")
