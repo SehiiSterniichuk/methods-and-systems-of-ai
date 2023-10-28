@@ -83,7 +83,7 @@ public class GraphRuleService implements RuleService {
     }
 
     private void saveRule(Rule rule, List<Long> ids) {
-        if(rule.getId() != null){
+        if (rule.getId() != null) {
             return;
         }
         if (repository.existsRuleByName(rule.getName())) {
@@ -154,7 +154,11 @@ public class GraphRuleService implements RuleService {
 
     @Override
     public long delete(long id) {
-        return 0;
+        long found = repository.findRuleById(id).map(Rule::getId).orElse(-1L);
+        if (found >= 1) {
+            repository.findRuleById(id);
+        }
+        return found;
     }
 
     @Override

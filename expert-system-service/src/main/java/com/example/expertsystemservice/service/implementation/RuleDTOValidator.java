@@ -2,6 +2,7 @@ package com.example.expertsystemservice.service.implementation;
 
 import com.example.expertsystemservice.domain.ActionDTO;
 import com.example.expertsystemservice.domain.RuleDTO;
+import com.example.expertsystemservice.domain.RuleType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +21,9 @@ public class RuleDTOValidator {
                 String checkFormula = checkFormula(r);
                 if (!checkFormula.isEmpty()) {
                     yield checkFormula;
+                }
+                if(r.decisionInfo().type() == RuleType.BINARY_FORMULA){
+                    yield "";
                 }
                 yield checkActionFormulas(r);
             }

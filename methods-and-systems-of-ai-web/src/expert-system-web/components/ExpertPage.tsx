@@ -4,6 +4,9 @@ import RuleScope from "./RuleScope";
 import "../styles/block-style.scss"
 import {ActionDTO, returnEmptyActionWithId, returnEmptyRuleWithId, RuleDTO} from "../data/ActionDTO";
 import {RuleType} from "../data/ActionType";
+import {PostTaskRequest} from "../../travelling-salesman-web/data/TaskData";
+import {SERVER_URL} from "../../travelling-salesman-web/data/Constants";
+import {sendRules} from "../networking/Requests";
 
 function ExpertPage() {
     const [rules, setRules] = useState([returnEmptyRuleWithId(1)])
@@ -78,6 +81,37 @@ function ExpertPage() {
             return -1;
         }
 
+        function parseActionArrayForARequest(actions: ActionDTO[] | undefined) {
+            if (actions === undefined) {
+                return [];
+            }
+
+            function isGoToEmpty(gotoAction: RuleDTO[] | undefined) {
+                return gotoAction === undefined || gotoAction.length == 0 ||
+                    (isEmptyName(gotoAction[0].name) && isEmptyId(gotoAction[0].id));
+            }
+
+            function isEmptyName(name: string | undefined) {
+                return name === undefined || name.trim() === "";
+            }
+
+            function isEmptyId(id: number | undefined) {
+                return id === undefined || id <= 0;
+            }
+
+            return actions
+                .filter(a => !(isGoToEmpty(a.gotoAction) && isEmptyName(a.name)))
+                .map(a => ({...a, id: undefined} as ActionDTO))
+        }
+
+        function parseArrayForARequest(rules: RuleDTO[]) {
+            return rules.map(r => {
+                const thenActions: ActionDTO[] = parseActionArrayForARequest(r.thenAction);
+                const elseActions: ActionDTO[] = parseActionArrayForARequest(r.elseAction);
+                return {...r, id: undefined, elseAction: elseActions, thenAction: thenActions} as RuleDTO;
+            })
+        }
+
         for (let i = 0; i < rules.length; i++) {
             const r = rules[i];
             if (r.name === undefined || r.name.trim() === "") {
@@ -111,10 +145,26 @@ function ExpertPage() {
             } else if (checkActionPower(r.elseAction || [], r, elseActionName) !== -1) {
                 break;
             }
-            console.log("valid")
+            setMessage("preparing request")
+            const preparedRules: RuleDTO[] = parseArrayForARequest(rules);
+            setMessage("sending...")
+            sendRules(preparedRules)
+                .then(x => x.json())
+                .then(x => x as number[])
+                .then(x => {
+                    if (x.length > 0) {
+                        setMessage(`Saved with id: ${x.join(',')}`)
+                    } else {
+                        setMessage("Saved nothing")
+                    }
+                })
+                .catch(e => {
+                    setMessage("Error")
+                    console.error(e);
+                })
         }
     }
-
+    //todo hide formula field for binary_formula actions
     const button = <div className="button-send-wrapper row">
         <p>{message}</p>
         <button onClick={sendNewRules} className={"post-new-rules-btn"}>Post new rules!</button>
