@@ -35,3 +35,14 @@ export async function findQuestions(string: string) {
     }
     return response;
 }
+
+export async function getRuleById(id: number) {
+    const response = await fetch(`${SERVER_URL}/api/v1/expert-system/rule/${id}/2`, {
+        method: 'GET',
+    });
+    if (!response.ok) {
+        const status = response.status;
+        console.error(`HTTP error! Status: ${status}`);
+    }
+    return response;
+}

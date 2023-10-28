@@ -4,7 +4,11 @@ import {Question} from "../../data/Question";
 import "../../styles/user.scss"
 import {findQuestions} from "../../networking/Requests";
 
-function SearchPage() {
+interface Props {
+    setRuleId: (id: number) => void
+}
+
+function SearchPage({setRuleId}: Props) {
     const [questions, setQuestions] = useState<Question[]>([]);
 
     function handleEnter(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -31,6 +35,12 @@ function SearchPage() {
         e.currentTarget.value = e.currentTarget.value.replace(/\s+/g, ' ');
     }
 
+    function handleQuestion(id: number) {
+        if (id >= 0) {
+            setRuleId(id);
+        }
+    }
+
     return (
         <section className={"search-section"}>
             <h1>Expert System</h1>
@@ -42,7 +52,8 @@ function SearchPage() {
                 </div>
                 <ul className={"search-results"}>
                     {questions.map(q => {
-                        return <li key={`question-item ${q.id}`} className={"question-result"}>
+                        return <li key={`question-item ${q.id}`} onClick={() => handleQuestion(q.id)}
+                                   className={"question-result"}>
                             <div className="question-text-data">
                                 <span className={"question-name"}>{q.name}</span>
                                 <span className={"question-condition"}>{q.condition}</span>
