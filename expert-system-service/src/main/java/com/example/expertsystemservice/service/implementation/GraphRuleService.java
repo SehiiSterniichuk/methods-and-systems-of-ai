@@ -163,8 +163,41 @@ public class GraphRuleService implements RuleService {
     }
 
     @Override
-    public long deleteAll(long id) {
-        return 0;
+    public List<Long> deleteAll(long id, long depth) {
+        if (depth < 1) {
+            return List.of();
+        }
+        Rule ruleById = findRuleById(id);
+        if (ruleById == null) {
+            return List.of();
+        }
+        List<Long> ids = new ArrayList<>();
+        deleteRule(ruleById, depth, ids);
+        return ids;
+    }
+
+    private void deleteRule(Rule rule, long depth, List<Long> ids) {
+        if(depth <= 0){
+            return;
+        }
+        depth--;
+        ids.add(rule.getId());
+        if(rule.getThenAction() != null){
+            deleteActions(rule.getThenAction(), depth, ids);
+        }
+        if(rule.getElseAction() != null){
+            deleteActions(rule.getElseAction(), depth, ids);
+        }
+        repository.delete(rule);
+    }
+
+    private void deleteActions(List<Action> thenAction, long depth, List<Long> ids) {
+        for (var action: thenAction) {
+            if(action.getGotoAction() != null){
+                action.getGotoAction().forEach(x->deleteRule(x, depth, ids));
+            }
+            actionRepository.delete(action);
+        }
     }
 
     @Override

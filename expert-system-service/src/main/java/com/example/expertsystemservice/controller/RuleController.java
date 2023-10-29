@@ -49,9 +49,9 @@ public class RuleController {
         return service.delete(id);
     }
 
-    @DeleteMapping("/all-hierarchy/{id}")
-    public long deleteAllRuleHierarchy(@PathVariable long id) {
-        return service.deleteAll(id);
+    @DeleteMapping("/all-hierarchy/{id}/{depth}")
+    public List<Long> deleteAllRuleHierarchy(@PathVariable long id, @PathVariable long depth) {
+        return service.deleteAll(id, depth);
     }
 
     @DeleteMapping("/all")

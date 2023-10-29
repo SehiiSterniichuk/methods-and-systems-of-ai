@@ -14,7 +14,7 @@ public interface RuleService {
 
     long delete(long id);
 
-    long deleteAll(long id);
+    List<Long> deleteAll(long id, long depth);
 
     long deleteAll();
 
