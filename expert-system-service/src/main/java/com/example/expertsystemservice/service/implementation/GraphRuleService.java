@@ -155,8 +155,9 @@ public class GraphRuleService implements RuleService {
     @Override
     public long delete(long id) {
         long found = repository.findRuleById(id).map(Rule::getId).orElse(-1L);
-        if (found >= 1) {
+        if (found >= 0) {
             repository.findRuleById(id);
+            repository.deleteById(id);
         }
         return found;
     }
@@ -172,5 +173,27 @@ public class GraphRuleService implements RuleService {
         repository.deleteAll();
         actionRepository.deleteAll();
         return count;
+    }
+
+    @Override
+    public RuleDTO updateFormula(long id, String newFormula) {
+        Optional<Rule> ruleById = repository.findRuleById(id);
+        if (ruleById.isPresent()) {
+            ruleById.get().setFormula(newFormula);
+            repository.save(ruleById.get());
+            return converter.toLeafDTO(ruleById.get());
+        }
+        return null;
+    }
+
+    @Override
+    public ActionDTO updateActionFormula(long id, String newFormula) {
+        var action = actionRepository.findById(id);
+        if (action.isPresent()) {
+            action.get().setFormula(newFormula);
+            actionRepository.save(action.get());
+            return actionConverter.toDTO(action.get(), List.of());
+        }
+        return null;
     }
 }

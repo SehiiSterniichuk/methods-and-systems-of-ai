@@ -29,7 +29,7 @@ public class DecisionServiceImpl implements DecisionService {
     public DecisionResponse makeDecision(DecisionRequest request) {
         RuleDTO rule = ruleService.getRule(GetRuleRequest.builder()
                 .id(request.ruleId())
-                .depth(1)
+                .depth(2)
                 .build());
         RuleType type = rule.decisionInfo().type();
         return switch (type) {
@@ -126,7 +126,7 @@ public class DecisionServiceImpl implements DecisionService {
             } else {
                 boolean result = calculator.evaluateToBoolean(a.formula().replaceAll(OUTPUT_VARIABLE, output));
                 DecisionStatus status = !result ? DecisionStatus.FAILED : DecisionStatus.SUCCESS;
-                return new Decision(null, status, a);
+                return new Decision(result + "", status, a);
             }
         }).toList();
     }
@@ -134,7 +134,7 @@ public class DecisionServiceImpl implements DecisionService {
     private DecisionResponse processBinary(RuleDTO rule, DecisionRequest request) {
         var value = request.variables().get(0).value();
         List<ActionDTO> actionDTO;
-        if (value.matches("(?i).*(?:1|\\+|ok|yes|true).*")) {
+        if (value.matches("(?i).*(?:1|\\+|ok|yes|true|так|yeah|sure).*")) {
             actionDTO = rule.thenAction();
         } else {
             actionDTO = rule.elseAction();

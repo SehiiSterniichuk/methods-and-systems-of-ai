@@ -33,6 +33,7 @@ function PostButton({rules}:Props) {
         function checkAction(actionList: ActionDTO[]) {
             for (let i = 0; i < actionList.length; i++) {
                 let action = actionList[i];
+                console.log("check")
                 if ((action.name === undefined || action.name.trim() === "")
                     && (action.gotoAction === undefined || action.gotoAction.length === 0 ||
                         (checkGoToAction(action.gotoAction[0]) !== -1)

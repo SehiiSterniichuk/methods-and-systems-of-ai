@@ -16,7 +16,7 @@ public class DecisionController {
     private final DecisionService service;
 
     @PostMapping
-    public DecisionResponse makeDecision(@Valid DecisionRequest request) {
+    public DecisionResponse makeDecision(@RequestBody @Valid DecisionRequest request) {
         return service.makeDecision(request);
     }
 

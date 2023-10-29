@@ -9,7 +9,7 @@ public record Variable(
         String name,
         @NotBlank
         String value) {
-    public final static String OUTPUT_VARIABLE = "Y";
+    public final static String OUTPUT_VARIABLE = "output";
     public final static String VARIABLE_POSTFIX = "_v";
 
 //    public final static Variable outputTrue = new Variable(OUTPUT_VARIABLE, "yes");

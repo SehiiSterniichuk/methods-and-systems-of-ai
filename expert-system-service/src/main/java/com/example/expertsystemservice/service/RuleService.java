@@ -1,5 +1,6 @@
 package com.example.expertsystemservice.service;
 
+import com.example.expertsystemservice.domain.ActionDTO;
 import com.example.expertsystemservice.domain.GetRuleRequest;
 import com.example.expertsystemservice.domain.PostRuleRequest;
 import com.example.expertsystemservice.domain.RuleDTO;
@@ -16,4 +17,8 @@ public interface RuleService {
     long deleteAll(long id);
 
     long deleteAll();
+
+    RuleDTO updateFormula(long id, String newFormula);
+
+    ActionDTO updateActionFormula(long id, String newFormula);
 }

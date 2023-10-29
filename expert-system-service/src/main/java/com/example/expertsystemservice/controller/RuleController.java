@@ -1,5 +1,6 @@
 package com.example.expertsystemservice.controller;
 
+import com.example.expertsystemservice.domain.ActionDTO;
 import com.example.expertsystemservice.domain.GetRuleRequest;
 import com.example.expertsystemservice.domain.PostRuleRequest;
 import com.example.expertsystemservice.domain.RuleDTO;
@@ -24,6 +25,14 @@ public class RuleController {
                         .depth(depth)
                         .id(id)
                 .build());
+    }
+    @PutMapping("/formula/{id}/{newFormula}")
+    public RuleDTO updateFormula(@PathVariable long id, @PathVariable String newFormula) {
+        return service.updateFormula(id, newFormula);
+    }
+    @PutMapping("action/formula/{id}/{newFormula}")
+    public ActionDTO updateActionFormula(@PathVariable long id, @PathVariable String newFormula) {
+        return service.updateActionFormula(id, newFormula);
     }
 
     //create a new rule. If the rule uses new rules as branches
