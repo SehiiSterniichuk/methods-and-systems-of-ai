@@ -52,7 +52,13 @@ function PostButton({rules}:Props) {
             }
             for (let i = 0; i < actionList.length; i++) {
                 let action = actionList[i];
-                if (action.formula === undefined || action.formula.trim() === "") {
+                const isNameInvalid = (action.name === undefined || action.name.trim() === "");
+                const isGotoInvalid = (action.gotoAction === undefined || action.gotoAction.length === 0);
+                const isInvalidFormula = action.formula === undefined || action.formula.trim() === "";
+                if(isInvalidFormula && isGotoInvalid && isNameInvalid){
+                    continue;
+                }
+                if (isInvalidFormula) {
                     setMessage(`missed formula for the ${actionName} #${r.id}.${action.id}`)
                     return action.id as number;
                 }

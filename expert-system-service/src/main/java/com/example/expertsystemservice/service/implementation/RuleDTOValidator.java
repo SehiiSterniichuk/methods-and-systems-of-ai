@@ -12,7 +12,7 @@ public class RuleDTOValidator {
 
     public String isValid(RuleDTO r) {//returns empty string if valid or message why not
         return switch (r.decisionInfo().type()) {
-            case BINARY -> checkActions(r);
+            case BINARY -> checkActionsBinary(r);
             case FORMULA, BINARY_FORMULA, VALUE_FORMULA -> {
                 String checkActions = checkActions(r);
                 if (!checkActions.isEmpty()) {
@@ -54,11 +54,21 @@ public class RuleDTOValidator {
         return "";
     }
 
-    private static String checkActions(RuleDTO r) {
+    private static String checkActionsBinary(RuleDTO r) {
         String notEmpty = "binary rule must contain then && else actions";
         if (r.thenAction() == null || r.elseAction() == null) {
             return notEmpty;
         } else if (r.thenAction().isEmpty() || r.elseAction().isEmpty()) {
+            return notEmpty;
+        }
+        return "";
+    }
+    private static String checkActions(RuleDTO r) {
+        String notEmpty = "Rule should contain any action";
+        if (r.thenAction() == null && r.elseAction() == null) {
+            return notEmpty;
+        } else if ((r.thenAction() != null && r.thenAction().isEmpty())
+               && (r.elseAction() != null && r.elseAction().isEmpty())) {
             return notEmpty;
         }
         return "";
