@@ -132,7 +132,11 @@ function ChatPage({startChatId}: Props) {
                 sendSimpleMessage("Server provided empty action:( :(", MessageType.EXPERT)
                 return;
             }
-            sendSimpleMessage(decision.action.name, MessageType.EXPERT);
+            if (lastExpertQuestion.decisionInfo?.type != RuleType.VALUE_FORMULA) {
+                sendSimpleMessage(decision.action.name, MessageType.EXPERT);
+            } else {
+                sendSimpleMessage(`Value:${decision.value}. ${decision.action.name}`, MessageType.EXPERT);
+            }
             setChatEnd(true);
         }
 
