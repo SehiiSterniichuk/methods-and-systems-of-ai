@@ -171,13 +171,13 @@ public class GraphRuleService implements RuleService {
         if (ruleById == null) {
             return List.of();
         }
-        List<Long> ids = new ArrayList<>();
+        Set<Long> ids = new HashSet<>();
         deleteRule(ruleById, depth, ids);
-        return ids;
+        return ids.stream().toList();
     }
 
-    private void deleteRule(Rule rule, long depth, List<Long> ids) {
-        if(depth <= 0){
+    private void deleteRule(Rule rule, long depth, Set<Long> ids) {
+        if(depth <= 0 || ids.contains(rule.getId())){
             return;
         }
         depth--;
@@ -191,7 +191,7 @@ public class GraphRuleService implements RuleService {
         repository.delete(rule);
     }
 
-    private void deleteActions(List<Action> thenAction, long depth, List<Long> ids) {
+    private void deleteActions(List<Action> thenAction, long depth, Set<Long> ids) {
         for (var action: thenAction) {
             if(action.getGotoAction() != null){
                 action.getGotoAction().forEach(x->deleteRule(x, depth, ids));

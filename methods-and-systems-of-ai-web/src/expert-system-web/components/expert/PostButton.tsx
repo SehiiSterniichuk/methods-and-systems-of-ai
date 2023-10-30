@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActionDTO, RuleDTO} from "../../data/ActionDTO";
 import {RuleType} from "../../data/ActionType";
 import {sendRules} from "../../networking/Requests";
@@ -7,8 +7,9 @@ interface Props {
     rules: RuleDTO[]
 }
 
-function PostButton({rules}:Props) {
+function PostButton({rules}: Props) {
     const [message, setMessage] = useState("");
+
     function checkGoToAction(ruleDTO: RuleDTO) {
         const isProvidedId = ruleDTO.id === undefined || ruleDTO.id <= 0;
         if (isProvidedId) {
@@ -27,7 +28,6 @@ function PostButton({rules}:Props) {
     function checkAction(actionList: ActionDTO[]) {
         for (let i = 0; i < actionList.length; i++) {
             let action = actionList[i];
-            console.log("check")
             if ((action.name === undefined || action.name.trim() === "")
                 && (action.gotoAction === undefined || action.gotoAction.length === 0 ||
                     (checkGoToAction(action.gotoAction[0]) !== -1)
@@ -49,7 +49,7 @@ function PostButton({rules}:Props) {
             const isNameInvalid = (action.name === undefined || action.name.trim() === "");
             const isGotoInvalid = (action.gotoAction === undefined || action.gotoAction.length === 0);
             const isInvalidFormula = action.formula === undefined || action.formula.trim() === "";
-            if(isInvalidFormula && isGotoInvalid && isNameInvalid){
+            if (isInvalidFormula && isGotoInvalid && isNameInvalid) {
                 continue;
             }
             if (isInvalidFormula) {
@@ -160,6 +160,15 @@ function PostButton({rules}:Props) {
                 console.error(e);
             })
     }
+
+    useEffect(() => {
+        console.log(message)
+        if (message.includes("Saved")) {
+            setTimeout(() => {
+                setMessage("");
+            }, 1000)
+        }
+    }, [message]);
     return (
         <div className="button-send-wrapper row">
             <p>{message}</p>
