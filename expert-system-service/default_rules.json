@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Computer turn on",
+    "condition": "Does the computer not turn on?",
+    "thenAction": [
+      {
+        "gotoAction": [
+          {
+            "name": "Check the power supply. isLaptop"
+          }
+        ]
+      }
+    ],
+    "elseAction": [
+      {
+        "name": "OK!"
+      }
+    ]
+  },
+  {
+    "name": "Check the power supply. isLaptop",
+    "condition": "Are you a laptop user?",
+    "thenAction": [
+      {
+        "gotoAction": [
+          {
+            "name": "Plug charger"
+          }
+        ]
+      }
+    ],
+    "elseAction": [
+      {
+        "name": "Turn on the computer in outlet"
+      }
+    ]
+  },
+  {
+    "name": "Plug charger",
+    "condition": "After 30 minutes of waiting, can you turn on your laptop?",
+    "thenAction": [
+      {
+        "name": "Success"
+      }
+    ],
+    "elseAction": [
+      {
+        "name": "Create a new rule"
+      }
+    ]
+  }
+]

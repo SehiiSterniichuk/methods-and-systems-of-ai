@@ -30,5 +30,5 @@ Given a list of cities, what is the shortest possible route that visits each cit
 ### Preview:
 Let's solve 32 points using a genetic algorithm. It would be 31! steps 🤯 without such a method.
 
-<img src="./methods-and-systems-of-ai-web/src/img/GeneticPreview_img32.gif" alt="work of genetic algorithm on tsp preview" style="width: 70%; display: block;">
+<img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/GeneticPreview_img32.gif" alt="work of genetic algorithm on tsp preview" style="width: 70%; display: block;">
   

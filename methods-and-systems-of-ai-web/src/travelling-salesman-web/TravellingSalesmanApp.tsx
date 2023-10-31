@@ -5,12 +5,12 @@ import SearcherConfig, {
     BreedingType,
     CrossoverType,
     defaultConfig,
-    defaultSearchConfig, Distance,
+    Distance,
     TaskConfig, TaskData
 } from "./data/TaskData";
 import Task from "./components/Task";
 
-function App() {
+function TravellingSalesmanApp() {
     const scalarInbreeding: SearcherConfig = {
         breedingType: BreedingType.INBREEDING,
         diffPercent: 33,
@@ -101,4 +101,4 @@ function App() {
     );
 }
 
-export default App;
+export default TravellingSalesmanApp;

@@ -1,0 +1,98 @@
+@import "constants";
+
+$border-radius: 1rem;
+.search-section {
+  width: 100%;
+  margin-top: 25vh;
+  display: flex;
+  margin-bottom: 3rem;
+  flex-direction: column;
+  align-items: center;
+  h1{
+    margin-bottom: 1rem;
+  }
+
+  .question-id {
+    width: 10%;
+    text-align: end;
+  }
+
+  .question-text-data {
+    width: 80%;
+
+    span {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+  }
+
+
+  .search-container {
+    background-color: #fff;
+    border-radius: 2rem;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 1rem;
+    padding-inline: 0.35rem;
+  }
+
+  .question-result {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding-block: .3rem;
+    padding-inline: .2rem;
+    cursor: pointer;
+  }
+  .question-result:hover{
+    background-color: rgba(124, 124, 124, 0.34);
+  }
+}
+
+.search-results {
+  width: 87%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-bar {
+  background-color: #fff;
+  height: 3rem;
+  border-start-start-radius: $border-radius;
+  width: 90%;
+  display: flex;
+  border-bottom: solid 2px $background-color;
+  align-items: center;
+
+  img {
+    display: block;
+    height: 65%;
+    margin-right: 5px;
+  }
+  $height: 1.5rem;
+
+  .search-input {
+    resize: none;
+    height: $height * 1.5;
+    width: 90%;
+    font-size: $height;
+    border: none;
+    overflow: hidden; /* Hide the scrollbars */
+  }
+  .search-input::placeholder{
+    font-size: $height * 0.91;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus,
+  a:focus {
+    outline: none;
+  }
+}

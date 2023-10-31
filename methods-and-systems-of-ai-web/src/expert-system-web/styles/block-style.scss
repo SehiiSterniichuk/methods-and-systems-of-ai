@@ -1,0 +1,120 @@
+@import "constants";
+
+.rule-scope{
+  border: 3px solid #fff;
+  width: 100%;
+}
+#root{
+  width: 100%;
+}
+.expert-page-main{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: 7.5%;
+}
+.section{
+  padding-block: 1rem;
+  padding-inline: 2rem;
+
+}
+.action-definition-section{
+  border-top: 3px solid #fff;
+}
+.block-title{
+}
+.block-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .plus-button {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    line-height: 3rem;
+    font-size: 4rem;
+    height: fit-content;
+    display: inline-block; /* This makes the button's height fit its content */
+  }
+  .block-title{
+    color: #fff;
+    font-size: 2.1rem;
+  }
+}
+
+.input-title-pair{
+  margin: 0.5rem;
+  p{
+    font-size: 1.5rem;
+    text-overflow: revert;
+    color: #fff;
+  }
+  .rectangle-input{
+    width: 100%;
+    min-width: 50%;
+    max-width: 100%;
+    font-size: 1.5rem;
+    min-height: 2rem;
+    height: 2rem;
+    text-overflow:ellipsis;
+  }
+  .id-input{
+    max-width: fit-content;
+  }
+}
+.choice-input{
+  .rectangle-input{
+    font-size: 105%;
+    font-weight: bold;
+    color: $background-color;
+    select{
+      color: $background-color;
+    }
+  }
+}
+
+.input-holder{
+  display: block;
+  .short-input-wrapper{
+    display: flex;
+    .input-title-pair{
+      width: 32%;
+    }
+  }
+  .long-input-wrapper{
+    .input-title-pair{
+      max-width: 100%;
+      .rectangle-input{
+        min-height: 2rem;
+        height: 3rem;
+        min-width: 33%;
+        max-width: 95%;
+        width: 50%;
+      }
+    }
+  }
+}
+
+.rule-scope{
+  margin-bottom: 3rem;
+}
+
+.post-new-rules-btn{
+  align-self: end;
+  background: #fff;
+  padding: .5rem;
+  border-radius: .5rem;
+  font-size: 1.25rem;
+  color: $background-color;
+  font-weight: bold;
+  border: none;
+}
+.button-send-wrapper{
+  align-self: end;
+  margin-bottom: 2rem;
+  align-items: center;
+  p{
+    color: #fff;
+    margin-right: 1.5rem;
+  }
+}
