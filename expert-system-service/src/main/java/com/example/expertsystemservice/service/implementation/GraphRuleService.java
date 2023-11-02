@@ -27,29 +27,31 @@ public class GraphRuleService implements RuleService {
     public RuleDTO getRule(@Valid GetRuleRequest request) {
         Rule rule = repository.findRuleById(request.id())
                 .orElseThrow(() -> new IllegalArgumentException("Not found rule with id: " + request.id()));
-        return ruleToDTO(rule, request.depth());
+        Set<Long> ids = new HashSet<>();
+        return ruleToDTO(rule, request.depth(), ids);
     }
 
-    private RuleDTO ruleToDTO(Rule rule, Long depth) {
-        if (depth <= 1) {
+    private RuleDTO ruleToDTO(Rule rule, Long depth, Set<Long> ids) {
+        if (depth <= 1 || ids.contains(rule.getId())) {
             return converter.toLeafDTO(rule);
         }
         --depth;
-        List<ActionDTO> elseActions = actionToDTO(rule.getElseAction(), depth);
-        List<ActionDTO> thenActions = actionToDTO(rule.getThenAction(), depth);
+        ids.add(rule.getId());
+        List<ActionDTO> elseActions = actionToDTO(rule.getElseAction(), depth, ids);
+        List<ActionDTO> thenActions = actionToDTO(rule.getThenAction(), depth, ids);
         return converter.toDTO(rule, thenActions, elseActions);
     }
 
-    private List<ActionDTO> actionToDTO(List<Action> actions, Long depth) {
+    private List<ActionDTO> actionToDTO(List<Action> actions, Long depth, Set<Long> ids) {
         return actions.stream()
-                .map(action -> actionToDTO(depth, action))
+                .map(action -> actionToDTO(depth, action, ids))
                 .toList();
     }
 
-    private ActionDTO actionToDTO(Long depth, Action action) {
+    private ActionDTO actionToDTO(Long depth, Action action, Set<Long> ids) {
         return actionConverter.toDTO(action, action.getGotoAction()
                 .stream()
-                .map(r -> this.ruleToDTO(r, depth))
+                .map(r -> this.ruleToDTO(r, depth, ids))
                 .toList());
     }
 
@@ -177,24 +179,24 @@ public class GraphRuleService implements RuleService {
     }
 
     private void deleteRule(Rule rule, long depth, Set<Long> ids) {
-        if(depth <= 0 || ids.contains(rule.getId())){
+        if (depth <= 0 || ids.contains(rule.getId())) {
             return;
         }
         depth--;
         ids.add(rule.getId());
-        if(rule.getThenAction() != null){
+        if (rule.getThenAction() != null) {
             deleteActions(rule.getThenAction(), depth, ids);
         }
-        if(rule.getElseAction() != null){
+        if (rule.getElseAction() != null) {
             deleteActions(rule.getElseAction(), depth, ids);
         }
         repository.delete(rule);
     }
 
     private void deleteActions(List<Action> thenAction, long depth, Set<Long> ids) {
-        for (var action: thenAction) {
-            if(action.getGotoAction() != null){
-                action.getGotoAction().forEach(x->deleteRule(x, depth, ids));
+        for (var action : thenAction) {
+            if (action.getGotoAction() != null) {
+                action.getGotoAction().forEach(x -> deleteRule(x, depth, ids));
             }
             actionRepository.delete(action);
         }
