@@ -119,26 +119,14 @@ function ChatPage({startChatId}: Props) {
 
     const [gotoNextMessage, setGotoNextMessage] = useState<number>(-1)
     useEffect(() => {
-        if(gotoNextMessage >= 0){
+        if (gotoNextMessage >= 0) {
             fetchAndSetNewRule(gotoNextMessage)
         }
     }, [gotoNextMessage]);
+
     function handleDecisionResponse(response: DecisionResponse) {
-        function handleSingleDecision(decision: Decision) {
-            if (decision.action.gotoAction !== undefined && decision.action.gotoAction.length > 0) {
-                const id = decision.action.gotoAction[0].id;
-                if (id === undefined) {
-                    sendSimpleMessage("Server didn't provide id to GOTO rule :(", MessageType.EXPERT)
-                    return;
-                }
-                if(decision.action.name !== undefined && decision.action.name !== ""){
-                    sendSimpleMessage(decision.action.name, MessageType.EXPERT)
-                }
-                setGotoNextMessage(id);
-                return;
-            }
+        function sendSimpleOrValueMessage(decision: Decision) {
             if (decision.action.name === undefined) {
-                sendSimpleMessage("Server provided empty action:( :(", MessageType.EXPERT)
                 return;
             }
             if (lastExpertQuestion.decisionInfo?.type != RuleType.VALUE_FORMULA) {
@@ -146,6 +134,24 @@ function ChatPage({startChatId}: Props) {
             } else {
                 sendSimpleMessage(`Value:${decision.value}. ${decision.action.name}`, MessageType.EXPERT);
             }
+        }
+
+        function handleSingleDecision(decision: Decision) {
+            if (decision.action.gotoAction !== undefined && decision.action.gotoAction.length > 0) {
+                const id = decision.action.gotoAction[0].id;
+                if (id === undefined) {
+                    sendSimpleMessage("Server didn't provide id to GOTO rule :(", MessageType.EXPERT)
+                    return;
+                }
+                sendSimpleOrValueMessage(decision);
+                setGotoNextMessage(id);
+                return;
+            }
+            if (decision.action.name === undefined) {
+                sendSimpleMessage("Server provided empty action:( :(", MessageType.EXPERT)
+                return;
+            }
+            sendSimpleOrValueMessage(decision);
             setChatEnd(true);
         }
 

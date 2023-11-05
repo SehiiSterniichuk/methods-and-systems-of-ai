@@ -1,9 +1,6 @@
 package com.example.expertsystemservice.service;
 
-import com.example.expertsystemservice.domain.ActionDTO;
-import com.example.expertsystemservice.domain.GetRuleRequest;
-import com.example.expertsystemservice.domain.PostRuleRequest;
-import com.example.expertsystemservice.domain.RuleDTO;
+import com.example.expertsystemservice.domain.*;
 
 import java.util.List;
 
@@ -21,4 +18,6 @@ public interface RuleService {
     RuleDTO updateFormula(long id, String newFormula);
 
     ActionDTO updateActionFormula(long id, String newFormula);
+
+    List<Long> connectActionsToRule(ConnectActionsToRuleRequest request);
 }

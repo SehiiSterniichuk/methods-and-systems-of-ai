@@ -231,4 +231,19 @@ public class GraphRuleService implements RuleService {
         }
         return null;
     }
+
+    @Override
+    public List<Long> connectActionsToRule(ConnectActionsToRuleRequest request) {
+        if (!repository.existsById(request.ruleId())) {
+            return List.of();
+        }
+        var list = request.actionIds()
+                .stream()
+                .map(actionRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get).map(Action::getId).toList();
+
+        actionRepository.createGOTORelationships(request.ruleId(), list);
+        return list;
+    }
 }

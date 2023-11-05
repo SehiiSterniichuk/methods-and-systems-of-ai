@@ -1,9 +1,6 @@
 package com.example.expertsystemservice.controller;
 
-import com.example.expertsystemservice.domain.ActionDTO;
-import com.example.expertsystemservice.domain.GetRuleRequest;
-import com.example.expertsystemservice.domain.PostRuleRequest;
-import com.example.expertsystemservice.domain.RuleDTO;
+import com.example.expertsystemservice.domain.*;
 import com.example.expertsystemservice.service.RuleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +39,11 @@ public class RuleController {
     @PostMapping
     public List<Long> postRules(@RequestBody @Valid PostRuleRequest request) {
         return service.createNewRule(request);
+    }
+
+    @PutMapping("/connect-actions")
+    public List<Long> connectActionsToRule(@RequestBody @Valid ConnectActionsToRuleRequest request) {
+        return service.connectActionsToRule(request);
     }
 
     @DeleteMapping("/{id}")
