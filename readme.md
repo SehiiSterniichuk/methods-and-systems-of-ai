@@ -1,4 +1,7 @@
 # Exploring Methods and Systems of AI
+## Content: 
+- [Genetic Algorithm](#genetic-algorithm-)
+- [Expert System](#expert-system-)
 
 ## Genetic Algorithm 🧬
 ### Task: ✈️
