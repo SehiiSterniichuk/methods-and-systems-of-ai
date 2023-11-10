@@ -126,7 +126,7 @@ function ChatPage({startChatId}: Props) {
 
     function handleDecisionResponse(response: DecisionResponse) {
         function sendSimpleOrValueMessage(decision: Decision) {
-            if (decision.action.name === undefined) {
+            if (decision.action.name === undefined || decision.action.name.trim() === '') {
                 return;
             }
             if (lastExpertQuestion.decisionInfo?.type != RuleType.VALUE_FORMULA) {
