@@ -40,7 +40,7 @@ function SurveyMessage({m, fetchAndSetNewRule,setChatEnd, sendSimpleMessage}: Pr
                     <input type="radio" value={id} disabled={disabled} onClick={() => handleChoice(id)}/>
                     <span> {d.value}</span>
                     <p>{d.action.name}</p>
-                    <p>{d.action.formula}</p>
+                    {/*<p>{d.action.formula}</p>*/}
                     <p>{d.action.gotoAction && d.action.gotoAction.length > 0 ? d.action.gotoAction[0].name : null}</p>
                 </label>
             })}

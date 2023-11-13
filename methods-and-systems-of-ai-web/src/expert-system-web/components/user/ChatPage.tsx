@@ -66,7 +66,7 @@ function ChatPage({startChatId}: Props) {
     }
 
     function convertToVarMessage(variableName: string) {
-        return `Enter value of the ${variableName}:`
+        return `Enter the ${variableName}:`
     }
 
     function sendSimpleMessage(s: string, type: MessageType) {
