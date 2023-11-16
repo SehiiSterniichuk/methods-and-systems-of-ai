@@ -3,59 +3,106 @@ package ua.kpi.iasa.sd.hopfieldneuralnetwork.service;
 import org.springframework.stereotype.Component;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Pattern;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Weight;
-
 import java.util.Arrays;
 import java.util.List;
 
 @Component
 public class HopfieldCalculator {
-    public Weight calc(List<Pattern> patterns) {
-        var p = patterns.stream().map(Pattern::p).toArray(int[][][]::new);
-        return calc(p);
+    public Weight calculateWeightMatrix(List<Pattern> patterns) {
+        var p = patterns.stream().map(Pattern::p).map(this::flattenPattern).toArray(int[][]::new);
+        return new Weight(calculateWeightMatrixFromFlat(p));
     }
 
-    public Weight calc(int[][][] p) {
-        int dimension = p[0].length;
-        float[][] weight = new float[dimension][dimension];
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if (i != j) {
-                    for (int[][] neighbors : p) {
-                        if(neighbors[i][j] != 1){
-                            continue;
-                        }
-                        weight[i][j] += neighbors[i][j];
-                    }
-                    weight[i][j] /= dimension;
-                }
-            }
-        }
+    public Weight calculateWeightMatrix(int[][][] p) {
+        var flattenPatterns = Arrays.stream(p).map(this::flattenPattern).toArray(int[][]::new);
+        float[][] weight = calculateWeightMatrixFromFlat(flattenPatterns);
         return new Weight(weight);
     }
 
-    public Pattern findPattern(Pattern pattern, Weight weight, int iterationNumber, float threshold) {
-        int[][] y = Arrays.stream(pattern.p()).map(a -> {
-            var newA = new int[a.length];
-            System.arraycopy(a, 0, newA, 0, a.length);
-            return newA;
-        }).toArray(int[][]::new);
-        float[][] w = weight.w();
-        int dimension = weight.w().length;
-        var y1 = new int[dimension][dimension];
-        for (int iteration = 0; iteration < iterationNumber; iteration++) {
-            for (int i = 0; i < dimension; i++) {
-                for (int j = 0; j < dimension; j++) {
-                    float weightedSum = 0;
-                    for (int k = 0; k < dimension; k++) {
-                        weightedSum += w[i][k] * y[k][j];
-                    }
-                    y1[i][j] = (weightedSum >= threshold) ? 1 : -1;
+    public float[][] calculateWeightMatrixFromFlat(int[][] patterns) {
+        int patternSize = patterns[0].length;
+        float[][] weightMatrix = new float[patternSize][patternSize];
+        for (int[] pattern : patterns) {
+            for (int i = 0; i < patternSize; i++) {
+                for (int j = 0; j < patternSize; j++) {
+                    if(i == j) continue;
+                    weightMatrix[i][j] += pattern[i] * pattern[j];
                 }
             }
-            var temp = y;
-            y = y1;
-            y1 = temp;
         }
-        return new Pattern(y);
+        // Normalize the weight matrix
+        for (int i = 0; i < patternSize; i++) {
+            for (int j = 0; j < patternSize; j++) {
+                weightMatrix[i][j] /= patternSize;
+            }
+        }
+        return weightMatrix;
+    }
+
+    public Pattern recallPattern(Pattern pattern, Weight weight, int iterationNumber) {
+        var y = flattenPattern(pattern.p());
+        var recalledPattern = reshapePattern(
+                recallPattern(y, weight.w(), iterationNumber),
+                pattern.p().length,
+                pattern.p()[0].length);
+        return new Pattern(recalledPattern);
+    }
+
+    public static int[] recallPattern(int[] input, float[][] weightMatrix, int iterationNumber) {
+        int patternSize = input.length;
+        int[] currentPattern = input.clone(); // Initialize the current pattern as the input
+
+        boolean stable = false;
+        float[] activationBuf = new float[patternSize];
+        for (int it = 0; !stable && it < iterationNumber; it++) {
+            int[] newPattern = new int[patternSize];
+            for (int i = 0; i < patternSize; i++) {
+                float activation = 0;
+                for (int j = 0; j < patternSize; j++) {
+                    activation += weightMatrix[i][j] * currentPattern[j];
+                }
+                activationBuf[i] = activation;
+            }
+            float min, max;
+            min = max = activationBuf[0];
+            for (int i = 1; i < activationBuf.length; i++) {
+                if (min > activationBuf[i]) {
+                    min = activationBuf[i];
+                } else if (max < activationBuf[i]) {
+                    max = activationBuf[i];
+                }
+            }
+            float threshold = (min + max) / 2;
+            for (int i = 0; i < newPattern.length; i++) {
+                newPattern[i] = (activationBuf[i] >= threshold) ? 1 : 0;
+            }
+            stable = java.util.Arrays.equals(currentPattern, newPattern);
+            currentPattern = newPattern.clone();
+        }
+        return currentPattern;
+    }
+
+    private int[] flattenPattern(int[][] pattern) {
+        int rows = pattern.length;
+        int cols = pattern[0].length;
+        int[] flattenedPattern = new int[rows * cols];
+        int index = 0;
+        for (int[] ints : pattern) {
+            for (int j = 0; j < cols; j++) {
+                flattenedPattern[index++] = ints[j];
+            }
+        }
+        return flattenedPattern;
+    }
+
+    public static int[][] reshapePattern(int[] pattern, int rows, int cols) {
+        int[][] reshapedPattern = new int[rows][cols];
+        int index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                reshapedPattern[i][j] = pattern[index++];
+            }
+        }
+        return reshapedPattern;
     }
 }

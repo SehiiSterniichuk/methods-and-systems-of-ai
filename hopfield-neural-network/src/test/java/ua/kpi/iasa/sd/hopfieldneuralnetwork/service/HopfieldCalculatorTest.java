@@ -16,30 +16,30 @@ class HopfieldCalculatorTest {
         var calculator = new HopfieldCalculator();
         int[][] pattern1 = new int[][]{
                 {1, 1, 1, 1, 1, 1},
-                {-1, -1, 1, 1, -1, -1},
-                {-1, -1, 1, 1, -1, -1},
-                {-1, -1, 1, 1, -1, -1},
-                {-1, -1, 1, 1, -1, -1}
+                {0, 0, 1, 1, 0, 0},
+                {0, 0, 1, 1, 0, 0},
+                {0, 0, 1, 1, 0, 0},
+                {0, 0, 1, 1, 0, 0}
         };
         int[][] pattern2 = new int[][]{
                 {1, 1, 1, 1, 1, 1},
-                {1, 1, -1, -1, -1, -1},
+                {1, 1, 0, 0, 0, 0},
                 {1, 1, 1, 1, 1, 1},
-                {1, 1, -1, -1, -1, -1},
+                {1, 1, 0, 0, 0, 0},
                 {1, 1, 1, 1, 1, 1}
         };
         int[][] pattern1Modified = new int[][]{
-                {1, 1, 1, 1, 1, -1},
-                {-1, -1, 1, 1, 1, -1},
-                {-1, -1, 1, 1, -1, -1},
-                {-1, -1, 1, 1, -1, 1},
-                {-1, -1, 1, 1, -1, -1}
+                {1, 1, 1, 1, 1, 0},
+                {0, 0, 1, 1, 1, 0},
+                {0, 0, 1, 1, 1, 0},
+                {0, 0, 1, 1, 0, 1},
+                {0, 0, 1, 1, 0, 0}
         };
         int[][][] pattern11 = {pattern1, pattern2};
-        Weight weight = calculator.calc(pattern11);
-        System.out.println(Arrays.deepToString(weight.w()));
-        Pattern response = calculator.findPattern(new Pattern(pattern1Modified), weight, 2000, 0.f);
-        System.out.println(Arrays.deepToString(response.p()));
+        Weight weight = calculator.calculateWeightMatrix(pattern11);
+        System.out.println(Arrays.deepToString(weight.w()).replaceAll("], ", "],\n"));
+        Pattern response = calculator.recallPattern(new Pattern(pattern1Modified), weight, 3);
+        System.out.println(Arrays.deepToString(response.p()).replaceAll("], ", "],\n"));
         assertArrayEquals(response.p(), pattern1);
     }
 }
