@@ -1,6 +1,7 @@
 package ua.kpi.iasa.sd.hopfieldneuralnetwork.service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ public class HopfieldService implements TaskService {
     private final ImageProcessingService imgService;
     private Weight weight;
 
-    public Long createNetwork(@Valid PostRequest postRequest) {
+    public Long createNetwork(@Valid @NotNull PostRequest postRequest) {
         validate(postRequest);
         weight = calculator.calculateWeightMatrix(postRequest.patterns());
         return 1L;
@@ -35,10 +36,10 @@ public class HopfieldService implements TaskService {
     }
 
     @Override
-    public Long createTask(@Valid PostTaskRequest postRequest) {
+    public Pattern createTask(@Valid PostTaskRequest postRequest) {
         Pattern pattern = calculator.recallPattern(postRequest.pattern(), weight, 10);
         System.out.println(pattern);
-        return 1L;
+        return pattern;
     }
 
     public Long createNetwork(MultipartFile[] images, @SuppressWarnings("unused") String name) {

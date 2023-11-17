@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Matrix} from "./Matrix";
+import {Pattern} from "../data/Pattern";
 
 interface Props {
-    matrix: Matrix,
+    matrix: Pattern,
     row: number,
     col: number,
     value: number,
@@ -10,14 +10,14 @@ interface Props {
     parentHeight: number,
 }
 
-function MatrixElement({matrix, row, col, value, parentHeight, parentWidth}: Props) {
+function MatrixElement({matrix, row, col, value, parentWidth}: Props) {
     const [selected, setSelected] = useState(value > 0);
     useEffect(() => {
-        setSelected(matrix.array[row][col] > 0);
+        setSelected(matrix.p[row][col] > 0);
     }, [matrix]);
 
     function clickElement(row: number, col: number) {
-        matrix.array[row][col] = selected ? 0 : 1;
+        matrix.p[row][col] = selected ? 0 : 1;
         setSelected(!selected);
     }
 
@@ -29,9 +29,9 @@ function MatrixElement({matrix, row, col, value, parentHeight, parentWidth}: Pro
     }
 
     return <div
-        onDragOver={e => dragOver(row, col)}
-        onClick={e => clickElement(row, col)}
-        style={{width: parentWidth / matrix.array.length, height: parentWidth / matrix.array.length}}
+        onDragOver={() => dragOver(row, col)}
+        onClick={() => clickElement(row, col)}
+        style={{width: parentWidth / matrix.p.length, height: parentWidth / matrix.p.length}}
         className={`matrix-element ${selected ? "selected-element" : "unselected-element"}`}>
     </div>
 }
