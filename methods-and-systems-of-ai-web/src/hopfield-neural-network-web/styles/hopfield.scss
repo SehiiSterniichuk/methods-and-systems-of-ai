@@ -1,0 +1,126 @@
+@import "../../constants";
+
+.hopfield-h1 {
+  margin-bottom: 2rem;
+}
+.hopfield-h2{
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.hopfield-change-mode-holder {
+  display: flex;
+  justify-content: end;
+
+  button {
+    margin-right: 2rem;
+    background-color: #fff;
+    color: $background-color;
+    padding: 0.5rem;
+    font-weight: bold;
+    border: none;
+    font-size: 1.25rem;
+    border-radius: 1rem;
+  }
+}
+
+.matrix-manipulation-body {
+  margin-inline: 2rem;
+}
+
+.matrix-manipulation-info {
+  margin-bottom: 1.5rem;
+}
+
+.pattern-info-p {
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.matrix-manager-wrapper {
+  width: 100%;
+  .matrix-info{
+    margin-left: 3rem;
+  }
+  .matrix-manager-wrapper-child {
+    max-width: 45%;
+  }
+}
+
+.matrix-manager {
+  max-width: 50%;
+  min-width: fit-content;
+
+  .matrix-element {
+    border: solid #000 1px;
+  }
+
+  .selected-element {
+    background-color: #000;
+  }
+
+  .unselected-element {
+    background-color: #fff;
+  }
+
+  .matrix-row {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+  }
+}
+
+.matrix-body {
+  width: 100%;
+  background-color: #fff;
+}
+
+.matrix-menu {
+  margin-top: 1rem;
+
+  .matrix-button {
+    background-color: #fff;
+    color: $background-color;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+    padding-inline: 0.25rem;
+    padding-block: 0.15rem;
+    width: 100%;
+  }
+
+  .matrix-button-row {
+    margin-bottom: 0.35rem;
+    justify-content: space-between;
+
+    .matrix-button {
+      width: 45%
+    }
+    .full-width{
+      width: 100%;
+    }
+  }
+}
+
+.matrix-info {
+  $height: 2rem;
+
+  .matrix-info-e {
+    height: $height;
+    margin-bottom: 0.5rem;
+  }
+
+  .matrix-info-p {
+    color: #fff;
+    font-size: $height * 0.70;
+    margin-right: 0.5rem;
+  }
+  input {
+    display: block;
+    width: 15rem;
+    font-size: $height * 0.75;
+  }
+}
+

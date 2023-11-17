@@ -5,6 +5,7 @@ import TravellingSalesmanApp from './travelling-salesman-web/TravellingSalesmanA
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import ExpertSystemApp from "./expert-system-web/ExpertSystemApp";
+import HopfieldApp from "./hopfield-neural-network-web/HopfieldApp";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,11 +13,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <BrowserRouter>
       <Routes>
-          <Route path="" element={<ExpertSystemApp />}>
+          <Route path="" element={<HopfieldApp />}>
           </Route>
           <Route path="/travelling-salesman-problem" element={<TravellingSalesmanApp />}>
           </Route>
           <Route path="/expert-system" element={<ExpertSystemApp />}>
+          </Route>
+          <Route path="/hopfield-neural-network" element={<HopfieldApp />}>
           </Route>
       </Routes>
   </BrowserRouter>
