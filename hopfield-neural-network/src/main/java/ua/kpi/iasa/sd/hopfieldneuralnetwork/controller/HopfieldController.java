@@ -13,13 +13,14 @@ import ua.kpi.iasa.sd.hopfieldneuralnetwork.service.HopfieldService;
 public class HopfieldController {
 
     private final HopfieldService service;
+
     @PostMapping
-    public Long postNetwork(@RequestBody PostRequest postRequest){
+    public Long postNetwork(@RequestBody PostRequest postRequest) {
         return service.createNetwork(postRequest);
     }
 
     @PostMapping("/img")
-    public Long postNetwork(@RequestParam MultipartFile[] images, @RequestParam String name){
+    public Long postNetwork(@RequestParam MultipartFile[] images, @RequestParam String name) {
         return service.createNetwork(images, name);
     }
 }

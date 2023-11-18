@@ -3,6 +3,8 @@ package ua.kpi.iasa.sd.hopfieldneuralnetwork.service;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Pattern;
@@ -14,6 +16,7 @@ import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class HopfieldService implements TaskService {
     private final HopfieldCalculator calculator;
     private final ImageProcessingService imgService;
@@ -37,9 +40,15 @@ public class HopfieldService implements TaskService {
 
     @Override
     public Pattern createTask(@Valid PostTaskRequest postRequest) {
-        Pattern pattern = calculator.recallPattern(postRequest.pattern(), weight, 10);
-        System.out.println(pattern);
-        return pattern;
+        return calculator.recallPattern(postRequest.pattern(), weight, weight.w().length);
+    }
+
+    @Override
+    public Resource createTask(MultipartFile image, String name) {
+        var pattern = imgService.resizeAndConvertImage(image, (int) Math.sqrt(weight.w().length));
+        log.info(STR. "pattern:\{ pattern.length } \{ weight.w().length }" ); //pattern:25 25
+        Pattern response = calculator.recallPattern(pattern, weight, Math.min(weight.w().length, 25));
+        return imgService.convertPatternToImageBytes(response, response.p().length);
     }
 
     public Long createNetwork(MultipartFile[] images, @SuppressWarnings("unused") String name) {
