@@ -3,7 +3,8 @@
 .hopfield-h1 {
   margin-bottom: 2rem;
 }
-.hopfield-h2{
+
+.hopfield-h2 {
   color: #fff;
   width: 100%;
   text-align: center;
@@ -41,9 +42,12 @@
 
 .matrix-manager-wrapper {
   width: 100%;
-  .matrix-info{
+  margin-bottom: 2rem;
+
+  .matrix-info {
     margin-left: 3rem;
   }
+
   .matrix-manager-wrapper-child {
     max-width: 45%;
   }
@@ -77,6 +81,13 @@
   background-color: #fff;
 }
 
+.img-input {
+  width: 100%;
+  display: block;
+}
+.img-input-body{
+  width: 25vw;
+}
 .matrix-menu {
   margin-top: 1rem;
 
@@ -98,7 +109,8 @@
     .matrix-button {
       width: 45%
     }
-    .full-width{
+
+    .full-width {
       width: 100%;
     }
   }
@@ -117,6 +129,7 @@
     font-size: $height * 0.70;
     margin-right: 0.5rem;
   }
+
   input {
     display: block;
     width: 15rem;
@@ -124,3 +137,15 @@
   }
 }
 
+.small-preview-selected-img{
+  width: 3rem;
+  margin-right: 1rem;
+}
+.saved-h3-list{
+  color: #fff;
+  margin-bottom: 1rem;
+  font-weight: unset;
+}
+.selected-img-list{
+  margin-bottom: 1rem;
+}

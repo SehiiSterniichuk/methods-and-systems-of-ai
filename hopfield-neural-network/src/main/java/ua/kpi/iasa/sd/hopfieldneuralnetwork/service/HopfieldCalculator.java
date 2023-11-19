@@ -18,13 +18,13 @@ public class HopfieldCalculator {
 
     public Weight calculateWeightMatrix(int[][][] p) {
         var flattenPatterns = Arrays.stream(p).map(HopfieldCalculator::flattenPattern).toArray(int[][]::new);
-        float[][] weight = calculateWeightMatrixFromFlat(flattenPatterns);
+        int[][] weight = calculateWeightMatrixFromFlat(flattenPatterns);
         return new Weight(weight);
     }
 
-    public float[][] calculateWeightMatrixFromFlat(int[][] patterns) {
+    public int[][] calculateWeightMatrixFromFlat(int[][] patterns) {
         int patternSize = patterns[0].length;
-        float[][] weightMatrix = new float[patternSize][patternSize];
+        int[][] weightMatrix = new int[patternSize][patternSize];
         for (int[] pattern : patterns) {
             for (int i = 0; i < patternSize; i++) {
                 for (int j = 0; j < patternSize; j++) {
@@ -55,20 +55,20 @@ public class HopfieldCalculator {
         return new Pattern(recalledPattern);
     }
 
-    public int[] recallPattern(int[] input, float[][] weightMatrix, int iterationNumber) {
+    public int[] recallPattern(int[] input, int[][] weightMatrix, int iterationNumber) {
         int patternSize = input.length;
         int[] currentPattern = input.clone(); // Initialize the current pattern as the input
-        float[] activationBuf = new float[patternSize];
+        int[] activationBuf = new int[patternSize];
         for (int it = 0; it < iterationNumber; ) {
             int[] newPattern = new int[patternSize];
             for (int i = 0; i < patternSize; i++) {
-                float activation = 0;
+                int activation = 0;
                 for (int j = 0; j < patternSize; j++) {
                     activation += weightMatrix[i][j] * currentPattern[j];
                 }
                 activationBuf[i] = activation;
             }
-            float min, max;
+            int min, max;
             min = max = activationBuf[0];
             for (int i = 1; i < activationBuf.length; i++) {
                 if (min > activationBuf[i]) {
@@ -77,7 +77,7 @@ public class HopfieldCalculator {
                     max = activationBuf[i];
                 }
             }
-            float threshold = (min + max) / 2;
+            int threshold = (min + max) / 2;
             for (int i = 0; i < newPattern.length; i++) {
                 newPattern[i] = (activationBuf[i] >= threshold) ? 1 : 0;
             }
