@@ -4,28 +4,37 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Pattern;
-import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.PostRequest;
-import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.PostTaskRequest;
-import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Weight;
+import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.*;
+import ua.kpi.iasa.sd.hopfieldneuralnetwork.repositories.ArrayRepository;
+import ua.kpi.iasa.sd.hopfieldneuralnetwork.repositories.NetworkRepository;
+import ua.kpi.iasa.sd.hopfieldneuralnetwork.repositories.WeightRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class HopfieldService implements TaskService {
+public class HopfieldService {
     private final HopfieldCalculator calculator;
     private final ImageProcessingService imgService;
-    private Weight weight;
+    private final NetworkRepository repository;
+    private final WeightRepository weightRepository;
+    private final ArrayRepository arrayRepository;
 
     public Long createNetwork(@Valid @NotNull PostRequest postRequest) {
         validate(postRequest);
-        weight = calculator.calculateWeightMatrix(postRequest.patterns());
-        return 1L;
+        var name = postRequest.name();
+        if (repository.existsByNameIgnoreCase(postRequest.name())) {
+            String message = STR. "Network with name \{ postRequest.name() } already exists" ;
+            log.error(message);
+            return -1L;
+        }
+        var weight = calculator.calculateWeightMatrix(postRequest.patterns());
+        return createNetwork(name, weight);
     }
 
     private static void validate(PostRequest postRequest) {
@@ -38,21 +47,31 @@ public class HopfieldService implements TaskService {
         });
     }
 
-    @Override
-    public Pattern createTask(@Valid PostTaskRequest postRequest) {
-        return calculator.recallPattern(postRequest.pattern(), weight, weight.w().length);
+    public Long createNetwork(MultipartFile[] images, String name) {
+        if (repository.existsByNameIgnoreCase(name)) {
+            String message = STR. "Network with name \{ name } already exists" ;
+            log.error(message);
+            return -1L;
+        }
+        var weight = new Weight(calculator.calculateWeightMatrixFromFlat(imgService.processImages(images)));
+        return createNetwork(name, weight);
     }
 
-    @Override
-    public Resource createTask(MultipartFile image, String name) {
-        var pattern = imgService.resizeAndConvertImage(image, (int) Math.sqrt(weight.w().length));
-        log.info(STR. "pattern:\{ pattern.length } \{ weight.w().length }" ); //pattern:25 25
-        Pattern response = calculator.recallPattern(pattern, weight, Math.min(weight.w().length, 25));
-        return imgService.convertPatternToImageBytes(response, response.p().length);
-    }
-
-    public Long createNetwork(MultipartFile[] images, @SuppressWarnings("unused") String name) {
-        weight = new Weight(calculator.calculateWeightMatrixFromFlat(imgService.processImages(images)));
-        return 2L;
+    private Long createNetwork(String name, Weight weight) {
+        Network n = new Network();
+        n.setName(name);
+        WeightEntity weightEntity = new WeightEntity();
+        List<ArrayRow> rows = new ArrayList<>(weight.w().length);
+        for (int i = 0; i < weight.w().length; i++) {
+            ArrayRow row = new ArrayRow();
+            row.setRowId(i);
+            row.setRow(weight.w()[i]);
+            rows.add(row);
+        }
+        arrayRepository.saveAll(rows);
+        weightEntity.setW(rows);
+        weightRepository.save(weightEntity);
+        n.setWeight(weightEntity);
+        return repository.save(n).getId();
     }
 }

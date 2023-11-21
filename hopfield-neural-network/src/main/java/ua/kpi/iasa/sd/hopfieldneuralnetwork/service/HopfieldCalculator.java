@@ -107,7 +107,6 @@ public class HopfieldCalculator {
     public static int[][] reshapePattern(int[] pattern, int rows, int cols) {
         int[][] reshapedPattern = new int[rows][cols];
         int index = 0;
-        System.out.println(STR. "rows:\{ rows } cols:\{ cols } pattern:\{ pattern.length }" ); //rows:5 cols:5 pattern:25
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 reshapedPattern[i][j] = pattern[index++];

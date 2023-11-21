@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.PostRequest;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.service.HopfieldService;
-
 @RestController
 @RequestMapping("api/v1/hopfield/network")
 @RequiredArgsConstructor
