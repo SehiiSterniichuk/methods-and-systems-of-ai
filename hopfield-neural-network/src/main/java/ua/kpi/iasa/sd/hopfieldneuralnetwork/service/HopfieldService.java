@@ -11,7 +11,6 @@ import ua.kpi.iasa.sd.hopfieldneuralnetwork.repositories.ArrayRepository;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.repositories.NetworkRepository;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.repositories.WeightRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -24,6 +23,8 @@ public class HopfieldService {
     private final NetworkRepository repository;
     private final WeightRepository weightRepository;
     private final ArrayRepository arrayRepository;
+    private final WeightConverter converter;
+
 
     public Long createNetwork(@Valid @NotNull PostRequest postRequest) {
         validate(postRequest);
@@ -61,13 +62,7 @@ public class HopfieldService {
         Network n = new Network();
         n.setName(name);
         WeightEntity weightEntity = new WeightEntity();
-        List<ArrayRow> rows = new ArrayList<>(weight.w().length);
-        for (int i = 0; i < weight.w().length; i++) {
-            ArrayRow row = new ArrayRow();
-            row.setRowId(i);
-            row.setRow(weight.w()[i]);
-            rows.add(row);
-        }
+        List<ArrayRow> rows = converter.toArrayRows(weight);
         arrayRepository.saveAll(rows);
         weightEntity.setW(rows);
         weightRepository.save(weightEntity);
