@@ -17,7 +17,7 @@ public class ArrayRow {
     @GeneratedValue
     private Long id;
     @Column(nullable = false)
-    private Integer rowId;
+    private Integer rowIndex;
     @Column(columnDefinition = "INTEGER[]", nullable = false)
     @Type(IntArrayType.class)
     private int[] row;

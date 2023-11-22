@@ -17,13 +17,12 @@ public class WeightConverter {
     public Weight convertToDTO(WeightEntity entity) {
         int size = entity.getW().size();
         int[][] w = new int[size][];
-        entity.getW().stream().mapToInt(ArrayRow::getRowId)
-                .forEach(i -> {
-                    int[] row = entity.getW().get(i).getRow();
+        entity.getW().forEach(i -> {
+                    int[] row = i.getRow();
                     if (row.length != 0) {
-                        w[i] = row;
+                        w[i.getRowIndex()] = row;
                     } else {
-                        w[i] = new int[size];
+                        w[i.getRowIndex()] = new int[size];
                     }
                 });
         return new Weight(w);
@@ -33,7 +32,7 @@ public class WeightConverter {
         List<ArrayRow> rows = new ArrayList<>(weight.w().length);
         for (int i = 0; i < weight.w().length; i++) {
             ArrayRow row = new ArrayRow();
-            row.setRowId(i);
+            row.setRowIndex(i);
             final int index = i;
             Arrays.stream(weight.w()[i]).parallel()
                     .filter(v -> v != 0)

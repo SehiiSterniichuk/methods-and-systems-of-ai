@@ -215,7 +215,7 @@ function HopfieldApp() {
                 <button onClick={() => setDataMode((dataMode + 1) % 2)}>Change data type</button>
             </div>
             <div className="matrix-manipulation-body">
-                {mode != HopfieldMode.CREATE ? null :
+                {mode != HopfieldMode.CREATE || dataMode == DataMode.FILE? null :
                     <div className="matrix-manipulation-info">
                         <p className={"pattern-info-p"}>Maximum number of
                             patterns {MAX_NUMBER}</p>
