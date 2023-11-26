@@ -7,29 +7,30 @@ import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Weight;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 @Log4j2
 public class HopfieldCalculator {
     public Weight calculateWeightMatrix(List<Pattern> patterns) {
-        var p = patterns.stream().map(Pattern::p).map(HopfieldCalculator::flattenPattern).toArray(int[][]::new);
+        var p = patterns.stream().map(Pattern::p).map(HopfieldCalculator::flattenPattern).toArray(byte[][]::new);
         return new Weight(calculateWeightMatrixFromFlat(p));
     }
 
-    public Weight calculateWeightMatrix(int[][][] p) {
-        var flattenPatterns = Arrays.stream(p).map(HopfieldCalculator::flattenPattern).toArray(int[][]::new);
-        int[][] weight = calculateWeightMatrixFromFlat(flattenPatterns);
+    public Weight calculateWeightMatrix(byte[][][] p) {
+        var flattenPatterns = Arrays.stream(p).map(HopfieldCalculator::flattenPattern).toArray(byte[][]::new);
+        var weight = calculateWeightMatrixFromFlat(flattenPatterns);
         return new Weight(weight);
     }
 
-    public int[][] calculateWeightMatrixFromFlat(int[][] patterns) {
+    public byte[][] calculateWeightMatrixFromFlat(byte[][] patterns) {
         int patternSize = patterns[0].length;
-        int[][] weightMatrix = new int[patternSize][patternSize];
-        for (int[] pattern : patterns) {
+        var weightMatrix = new byte[patternSize][patternSize];
+        for (var pattern : patterns) {
             for (int i = 0; i < patternSize; i++) {
                 for (int j = 0; j < patternSize; j++) {
                     if (i == j) continue;
-                    weightMatrix[i][j] += pattern[i] * pattern[j];
+                    weightMatrix[i][j] += (byte) (pattern[i] * pattern[j]);
                 }
             }
         }
@@ -38,7 +39,6 @@ public class HopfieldCalculator {
 
     public Pattern recallPattern(Pattern pattern, Weight weight, int iterationNumber) {
         var y = flattenPattern(pattern.p());
-        log.info(STR. "pattern:\{ y.length } \{ weight.w().length }" );
         var recalledPattern = reshapePattern(
                 recallPattern(y, weight.w(), iterationNumber),
                 pattern.p().length,
@@ -46,7 +46,7 @@ public class HopfieldCalculator {
         return new Pattern(recalledPattern);
     }
 
-    public Pattern recallPattern(int[] input, Weight weight, int iterationNumber) {
+    public Pattern recallPattern(byte[] input, Weight weight, int iterationNumber) {
         int length = (int) Math.sqrt(weight.w().length);
         var recalledPattern = reshapePattern(
                 recallPattern(input, weight.w(), iterationNumber),
@@ -55,12 +55,12 @@ public class HopfieldCalculator {
         return new Pattern(recalledPattern);
     }
 
-    public int[] recallPattern(int[] input, int[][] weightMatrix, int iterationNumber) {
+    public byte[] recallPattern(byte[] input, byte[][] weightMatrix, int iterationNumber) {
         int patternSize = input.length;
-        int[] currentPattern = input.clone(); // Initialize the current pattern as the input
-        int[] activationBuf = new int[patternSize];
+        var currentPattern = copyByteToIntPattern(input);
+        var newPattern = new int[patternSize];
+        var activationBuf = new int[patternSize];
         for (int it = 0; it < iterationNumber; ) {
-            int[] newPattern = new int[patternSize];
             for (int i = 0; i < patternSize; i++) {
                 int activation = 0;
                 for (int j = 0; j < patternSize; j++) {
@@ -86,17 +86,31 @@ public class HopfieldCalculator {
             } else {
                 it = 0;
             }
-            currentPattern = newPattern.clone();
+            var temp = currentPattern;
+            currentPattern = newPattern;//todo try to minimize cloning and allocation of space
+            newPattern = temp;
         }
-        return currentPattern;
+        return copyIntToBytePattern(currentPattern);
     }
 
-    public static int[] flattenPattern(int[][] pattern) {
+    private static int[] copyByteToIntPattern(byte[] input) {
+        var receiver = new int[input.length];
+        IntStream.range(0, input.length).forEach(i -> receiver[i] = input[i]);
+        return receiver;
+    }
+
+    private static byte[] copyIntToBytePattern(int[] input) {
+        var receiver = new byte[input.length];
+        IntStream.range(0, input.length).forEach(i -> receiver[i] = (byte) input[i]);
+        return receiver;
+    }
+
+    public static byte[] flattenPattern(byte[][] pattern) {
         int rows = pattern.length;
         int cols = pattern[0].length;
-        int[] flattenedPattern = new int[rows * cols];
+        var flattenedPattern = new byte[rows * cols];
         int index = 0;
-        for (int[] ints : pattern) {
+        for (var ints : pattern) {
             for (int j = 0; j < cols; j++) {
                 flattenedPattern[index++] = ints[j];
             }
@@ -104,8 +118,8 @@ public class HopfieldCalculator {
         return flattenedPattern;
     }
 
-    public static int[][] reshapePattern(int[] pattern, int rows, int cols) {
-        int[][] reshapedPattern = new int[rows][cols];
+    public static byte[][] reshapePattern(byte[] pattern, int rows, int cols) {
+        var reshapedPattern = new byte[rows][cols];
         int index = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {

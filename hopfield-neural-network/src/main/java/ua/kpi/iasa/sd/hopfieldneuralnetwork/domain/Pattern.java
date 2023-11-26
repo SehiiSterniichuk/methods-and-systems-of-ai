@@ -1,4 +1,4 @@
 package ua.kpi.iasa.sd.hopfieldneuralnetwork.domain;
 
-public record Pattern(int[][] p) {
+public record Pattern(byte[][] p) {
 }

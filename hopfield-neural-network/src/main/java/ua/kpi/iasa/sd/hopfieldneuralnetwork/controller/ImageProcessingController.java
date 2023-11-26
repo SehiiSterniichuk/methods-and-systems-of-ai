@@ -17,7 +17,7 @@ public class ImageProcessingController {
     private final ImageProcessingService service;
 
     @PostMapping("/convert-to-pattern")
-    public int[][] processImages(@RequestParam("images") MultipartFile[] images) {
+    public byte[][] processImages(@RequestParam("images") MultipartFile[] images) {
         return service.processImages(images);
     }
 

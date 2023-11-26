@@ -23,7 +23,7 @@ import static ua.kpi.iasa.sd.hopfieldneuralnetwork.service.HopfieldCalculator.fl
 public class ImageProcessingService {
     final int DIMENSION = 80;
 
-    public int[][] processImages(MultipartFile[] images) {
+    public byte[][] processImages(MultipartFile[] images) {
         List<BufferedImage> img = new ArrayList<>(images.length);
         for (MultipartFile image : images) {
             try {
@@ -39,10 +39,10 @@ public class ImageProcessingService {
             min = DIMENSION;
         }
         int finalMin = min;
-        return img.stream().map(i -> convertToBinaryArray(i, finalMin)).toArray(int[][]::new);
+        return img.stream().map(i -> convertToBinaryArray(i, finalMin)).toArray(byte[][]::new);
     }
 
-    public int[] resizeAndConvertImage(MultipartFile image, int dimension) {
+    public byte[] resizeAndConvertImage(MultipartFile image, int dimension) {
         BufferedImage bufferedImage;
         try {
             bufferedImage = ImageIO.read(image.getInputStream());
@@ -84,8 +84,8 @@ public class ImageProcessingService {
         return resizedImage;
     }
 
-    private int[] convertToBinaryArray(BufferedImage image, int dimension) {
-        int[] binaryArray = new int[dimension * dimension];
+    private byte[] convertToBinaryArray(BufferedImage image, int dimension) {
+        byte[] binaryArray = new byte[dimension * dimension];
         for (int y = 0; y < dimension; y++) {
             for (int x = 0; x < dimension; x++) {
                 int color = image.getRGB(x, y);
@@ -94,7 +94,7 @@ public class ImageProcessingService {
                 int blue = color & 0xFF;
                 int grayscale = (red + green + blue) / 3; // Simple grayscale conversion
                 // Convert grayscale to binary: 1 represents black, 0 represents white
-                binaryArray[y * dimension + x] = (grayscale < 128) ? 1 : 0;
+                binaryArray[y * dimension + x] = (byte)((grayscale < 128) ? 1 : 0);
             }
         }
         return binaryArray;
@@ -103,7 +103,7 @@ public class ImageProcessingService {
     public Resource convertPatternToImageBytes(Pattern pattern, int dimension) {
         BufferedImage image = new BufferedImage(dimension, dimension, BufferedImage.TYPE_INT_RGB);
         WritableRaster raster = image.getRaster();
-        int[] flattenedPattern = flattenPattern(pattern.p());
+        byte[] flattenedPattern = flattenPattern(pattern.p());
         int[] pixelData = new int[flattenedPattern.length];
         for (int i = 0; i < flattenedPattern.length; i++) {
             int pixelValue = (flattenedPattern[i] == 1) ? 0 : 255; // 1 to black, 0 to white

@@ -8,24 +8,37 @@ import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.WeightEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 public class WeightConverter {
 
-    private static final int[] EMPTY_ARRAY = {};
+    private static final boolean[] EMPTY_ARRAY = {};
 
     public Weight convertToDTO(WeightEntity entity) {
         int size = entity.getW().size();
-        int[][] w = new int[size][];
+        var w = new byte[size][];
         entity.getW().forEach(i -> {
-                    int[] row = i.getRow();
-                    if (row.length != 0) {
-                        w[i.getRowIndex()] = row;
-                    } else {
-                        w[i.getRowIndex()] = new int[size];
-                    }
-                });
+            var row = i.getRow();
+            if (row.length != 0) {
+                w[i.getRowIndex()] = toByteArray(row);
+            } else {
+                w[i.getRowIndex()] = new byte[size];
+            }
+        });
         return new Weight(w);
+    }
+
+    private byte[] toByteArray(boolean[] row) {
+        var data = new byte[row.length];
+        IntStream.range(0, row.length).forEach(i -> data[i] = (byte) (row[i] ? 1 : 0));
+        return data;
+    }
+//todo compare speed of boolean vs int
+    private boolean[] toBooleanArray(byte[] row) {
+        var data = new boolean[row.length];
+        IntStream.range(0, row.length).forEach(i -> data[i] = row[i] == 1);
+        return data;
     }
 
     public List<ArrayRow> toArrayRows(Weight weight) {
@@ -34,10 +47,10 @@ public class WeightConverter {
             ArrayRow row = new ArrayRow();
             row.setRowIndex(i);
             final int index = i;
-            Arrays.stream(weight.w()[i]).parallel()
+            IntStream.range(0, weight.w()[i].length).parallel().map(v -> weight.w()[index][v])
                     .filter(v -> v != 0)
                     .findAny()
-                    .ifPresentOrElse(p -> row.setRow(weight.w()[index]), () -> row.setRow(EMPTY_ARRAY));
+                    .ifPresentOrElse(p -> row.setRow(toBooleanArray(weight.w()[index])), () -> row.setRow(EMPTY_ARRAY));
             rows.add(row);
         }
         return rows;

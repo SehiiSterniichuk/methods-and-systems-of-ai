@@ -11,7 +11,7 @@ import java.util.List;
 @EqualsAndHashCode(of = {"id"})
 public class WeightEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @OneToMany
     @Column(nullable = false)
