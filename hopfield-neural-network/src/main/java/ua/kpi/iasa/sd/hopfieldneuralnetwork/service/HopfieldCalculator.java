@@ -1,6 +1,5 @@
 package ua.kpi.iasa.sd.hopfieldneuralnetwork.service;
 
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Pattern;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Weight;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @Component
-@Log4j2
 public class HopfieldCalculator {
     public Weight calculateWeightMatrix(List<Pattern> patterns) {
         var p = patterns.stream().map(Pattern::p).map(HopfieldCalculator::flattenPattern).toArray(byte[][]::new);
@@ -60,7 +58,7 @@ public class HopfieldCalculator {
         var currentPattern = copyByteToIntPattern(input);
         var newPattern = new int[patternSize];
         var activationBuf = new int[patternSize];
-        for (int it = 0; it < iterationNumber; ) {
+        for (int it = 0; it < iterationNumber; it++) {
             for (int i = 0; i < patternSize; i++) {
                 int activation = 0;
                 for (int j = 0; j < patternSize; j++) {
@@ -81,13 +79,8 @@ public class HopfieldCalculator {
             for (int i = 0; i < newPattern.length; i++) {
                 newPattern[i] = (activationBuf[i] >= threshold) ? 1 : 0;
             }
-            if (Arrays.equals(currentPattern, newPattern)) {
-                it++;
-            } else {
-                it = 0;
-            }
             var temp = currentPattern;
-            currentPattern = newPattern;//todo try to minimize cloning and allocation of space
+            currentPattern = newPattern;
             newPattern = temp;
         }
         return copyIntToBytePattern(currentPattern);
@@ -95,13 +88,13 @@ public class HopfieldCalculator {
 
     private static int[] copyByteToIntPattern(byte[] input) {
         var receiver = new int[input.length];
-        IntStream.range(0, input.length).forEach(i -> receiver[i] = input[i]);
+        IntStream.range(0, input.length).parallel().forEach(i -> receiver[i] = input[i]);
         return receiver;
     }
 
     private static byte[] copyIntToBytePattern(int[] input) {
         var receiver = new byte[input.length];
-        IntStream.range(0, input.length).forEach(i -> receiver[i] = (byte) input[i]);
+        IntStream.range(0, input.length).parallel().forEach(i -> receiver[i] = (byte) input[i]);
         return receiver;
     }
 

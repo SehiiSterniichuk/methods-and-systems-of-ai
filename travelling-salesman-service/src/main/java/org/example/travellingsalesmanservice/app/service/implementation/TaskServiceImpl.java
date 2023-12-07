@@ -100,7 +100,6 @@ public class TaskServiceImpl implements TaskService {
         taskService.addMessage(id, message);
     }
 
-    //todo try to delete this:)
     private void removeAfterTime(String id) {
         executor.execute(() -> {
             try {

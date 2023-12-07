@@ -21,7 +21,7 @@ import static ua.kpi.iasa.sd.hopfieldneuralnetwork.service.HopfieldCalculator.fl
 
 @Service
 public class ImageProcessingService {
-    final int DIMENSION = 80;
+    public static final int DIMENSION = 80;
 
     public byte[][] processImages(MultipartFile[] images) {
         List<BufferedImage> img = new ArrayList<>(images.length);

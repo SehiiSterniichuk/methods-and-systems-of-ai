@@ -2,6 +2,7 @@
 ## Content: 
 - [Genetic Algorithm](#genetic-algorithm-)
 - [Expert System](#expert-system-)
+- [Hopfield Neural Network](#hopfield-neural-network-)
 
 ## Genetic Algorithm 🧬
 ### Task: ✈️
@@ -69,3 +70,27 @@ Create a versatile rule-based expert system capable of providing automated exper
 <img alt="search rule screenshot" src="./methods-and-systems-of-ai-web/public/search.png" style="width: 75%"/>
 <img alt="chat with expert system screenshot" src="./methods-and-systems-of-ai-web/public/chat.png" style="width: 75%; display: block"/>
 
+### Hopfield Neural Network 🧠
+
+Unveil the potential of the Hopfield Neural Network for pattern recall, whether from images or direct matrix representations. This versatile neural network, inspired by human memory functions, excels at recognizing patterns embedded within various data forms.
+
+### Functionality:
+
+**🖌️ Drawing within a Front-end Page:** Users can draw patterns on the webpage or submit matrix representations directly to the server for processing.
+
+**📷 Image and Matrix Processing:** Receive images or matrix data from clients, convert images to grayscale, and process matrices to recognize embedded patterns.
+
+**👀 Pattern Recognition:** Submit fragmented or incomplete patterns, either in image or matrix form, for restoration. Simply specify the network name to trigger pattern retrieval from PostgreSQL for efficient reconstruction.
+
+### Built With
+#### Backend part:
+- Java 21 <img src="https://cdn.jsdelivr.net/npm/programming-languages-logos/src/java/java.png" style="height: 1rem">
+- Spring Boot <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/spring-boot-logo.png"  style="height: 1rem"/>
+- PostgreSQL 🐘
+- Lombok 🏝️
+- Integration/Unit testing 🤯
+#### Frontend part:
+- React 🚀
+- TypeScript 💪
+- HTML 5️⃣
+- SCSS 😎

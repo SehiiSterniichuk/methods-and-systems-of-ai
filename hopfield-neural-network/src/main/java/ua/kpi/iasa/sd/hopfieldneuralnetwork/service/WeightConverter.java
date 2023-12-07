@@ -6,7 +6,6 @@ import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.Weight;
 import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.WeightEntity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -31,13 +30,12 @@ public class WeightConverter {
 
     private byte[] toByteArray(boolean[] row) {
         var data = new byte[row.length];
-        IntStream.range(0, row.length).forEach(i -> data[i] = (byte) (row[i] ? 1 : 0));
+        IntStream.range(0, row.length).parallel().forEach(i -> data[i] = (byte) (row[i] ? 1 : 0));
         return data;
     }
-//todo compare speed of boolean vs int
     private boolean[] toBooleanArray(byte[] row) {
         var data = new boolean[row.length];
-        IntStream.range(0, row.length).forEach(i -> data[i] = row[i] == 1);
+        IntStream.range(0, row.length).parallel().forEach(i -> data[i] = row[i] == 1);
         return data;
     }
 
