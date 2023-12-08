@@ -20,8 +20,7 @@ city?
   MongoDB <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/mongodb_transparent.png"  style="height: 1rem"/>
 - Tweaking genetic algorithm with different parameters 🤓
 - Client can track current state of the server's work and dynamically draw a current shortest path 🖼️
-- All statistic stored in
-  MongoDB <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/mongodb_transparent.png"  style="height: 1rem"/>
+- All statistic stored in MongoDB <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/mongodb_transparent.png"  style="height: 1rem"/>
 - Server gather statistic and return a line chart on a request 📈
 
 ### Built With
@@ -29,15 +28,11 @@ city?
 #### Backend part:
 
 - Java 21 <img src="https://cdn.jsdelivr.net/npm/programming-languages-logos/src/java/java.png" style="height: 1rem">
-- Spring
-  Boot <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/spring-boot-logo.png"  style="height: 1rem"/>
+- Spring Boot <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/spring-boot-logo.png"  style="height: 1rem"/>
 - Vector API. Preview feature. SIMD machine.⚡
 - VirtualThreadPerTaskExecutor 🤖
 - StringTemplate ➕
--
-
-MongoDB <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/mongodb_transparent.png"  style="height: 1rem"/>
-
+- MongoDB <img src="./methods-and-systems-of-ai-web/src/travelling-salesman-web/img/mongodb_transparent.png"  style="height: 1rem"/>
 - Integration/Unit testing
 - Lombok 🏝️
 - JFreeChart 📈
