@@ -7,7 +7,6 @@ import ua.kpi.iasa.sd.hopfieldneuralnetwork.domain.WeightEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 @Component
