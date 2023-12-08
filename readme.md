@@ -146,7 +146,7 @@ Simply specify the network name to trigger pattern retrieval from PostgreSQL for
 
 ##### Image processing:
 
-Create network1:
+<p>Create network1:</p>
 <img src="./methods-and-systems-of-ai-web/src/hopfield-neural-network-web/img/img_pattern/poets_init.png" style="width: 37%; display: block;" alt="image processing preview">
 Fragment of pattern1:
 <img src="./methods-and-systems-of-ai-web/src/hopfield-neural-network-web/img/img_pattern/find_pattern1.png" style="width: 37%; display: block;" alt="image processing preview">
@@ -171,7 +171,7 @@ Recalled letters:
 
 ##### Drawn patterns:
 
-You can easily draw patterns on the webpage.
+<p>You can easily draw patterns on the webpage.</p>
 <img src="./methods-and-systems-of-ai-web/src/hopfield-neural-network-web/img/drawn_pattern/hello_world.png" style="width: 37%; display: block;" alt="image processing preview">
 Create network:
 <div style="display: flex;">
