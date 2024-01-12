@@ -27,6 +27,7 @@
         <module>methods-and-systems-of-ai-web</module>
         <module>travelling-salesman-service</module>
         <module>expert-system-service</module>
+        <module>hopfield-neural-network</module>
     </modules>
     <repositories>
         <repository>
